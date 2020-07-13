@@ -89,3 +89,35 @@ train_loader = DataLoader(
 # create a validation data loader
 val_ds = monai.data.Dataset(data=val_files, transform=val_transforms)
 val_loader = DataLoader(val_ds, batch_size=1, num_workers=4, collate_fn=list_data_collate)
+
+# create UNet, DiceLoss and Adam optimizer
+# device = torch.device("cuda:0")  # you don't need device, because Catalyst uses autoscaling
+model = monai.networks.nets.UNet(
+    dimensions=3,
+    in_channels=1,
+    out_channels=1,
+    channels=(16, 32, 64, 128, 256),
+    strides=(2, 2, 2, 2),
+    num_res_units=2,
+)
+loss_function = monai.losses.DiceLoss(sigmoid=True)
+optimizer = torch.optim.Adam(model.parameters(), 1e-3)
+
+dice_metric = DiceMetric(include_background=True, to_onehot_y=False, sigmoid=True, reduction="mean")
+
+class MonaiSupervisedRunner(dl.SupervisedRunner):
+
+  def forward(self, batch):
+    if self.is_train_loader:
+      output = {self.output_key: self.model(batch[self.input_key])}
+    elif self.is_valid_loader:
+      roi_size = (96, 96, 96)
+      sw_batch_size = 4
+      output = {self.output_key: sliding_window_inference(batch[self.input_key], roi_size, sw_batch_size, self.model)}
+    elif self.is_infer_loader:
+      roi_size = (96, 96, 96)
+      sw_batch_size = 4
+      batch = self._batch2device(batch, self.device)
+      output = {self.output_key: sliding_window_inference(batch[self.input_key], roi_size, sw_batch_size, self.model)}
+      output = {**output, **batch}
+    return output
