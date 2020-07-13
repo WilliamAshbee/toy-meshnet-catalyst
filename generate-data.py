@@ -42,3 +42,50 @@ for i in range(40):
     nib.save(n, os.path.join(tempdir, f"seg{i:d}.nii.gz"))
 images = sorted(glob(os.path.join(tempdir, "img*.nii.gz")))
 segs = sorted(glob(os.path.join(tempdir, "seg*.nii.gz")))
+
+train_files = [{"img": img, "seg": seg} for img, seg in zip(images[:20], segs[:20])]
+val_files = [{"img": img, "seg": seg} for img, seg in zip(images[-20:], segs[-20:])]
+
+# define transforms for image and segmentation
+train_transforms = Compose(
+    [
+        LoadNiftid(keys=["img", "seg"]),
+        AsChannelFirstd(keys=["img", "seg"], channel_dim=-1),
+        ScaleIntensityd(keys=["img", "seg"]),
+        RandCropByPosNegLabeld(
+            keys=["img", "seg"], label_key="seg", spatial_size=[96, 96, 96], pos=1, neg=1, num_samples=4
+        ),
+        RandRotate90d(keys=["img", "seg"], prob=0.5, spatial_axes=[0, 2]),
+        ToTensord(keys=["img", "seg"]),
+    ]
+)
+val_transforms = Compose(
+    [
+        LoadNiftid(keys=["img", "seg"]),
+        AsChannelFirstd(keys=["img", "seg"], channel_dim=-1),
+        ScaleIntensityd(keys=["img", "seg"]),
+        ToTensord(keys=["img", "seg"]),
+    ]
+)
+
+# define dataset, data loader
+check_ds = monai.data.Dataset(data=train_files, transform=train_transforms)
+# use batch_size=2 to load images and use RandCropByPosNegLabeld to generate 2 x 4 images for network training
+check_loader = DataLoader(check_ds, batch_size=2, num_workers=4, collate_fn=list_data_collate)
+check_data = monai.utils.misc.first(check_loader)
+print(check_data["img"].shape, check_data["seg"].shape)
+
+# create a training data loader
+train_ds = monai.data.Dataset(data=train_files, transform=train_transforms)
+# use batch_size=2 to load images and use RandCropByPosNegLabeld to generate 2 x 4 images for network training
+train_loader = DataLoader(
+    train_ds,
+    batch_size=2,
+    shuffle=True,
+    num_workers=4,
+    collate_fn=list_data_collate,
+    pin_memory=torch.cuda.is_available(),
+)
+# create a validation data loader
+val_ds = monai.data.Dataset(data=val_files, transform=val_transforms)
+val_loader = DataLoader(val_ds, batch_size=1, num_workers=4, collate_fn=list_data_collate)
