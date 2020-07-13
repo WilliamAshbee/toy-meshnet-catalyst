@@ -25,6 +25,8 @@ from monai.inferers import sliding_window_inference
 from monai.metrics import DiceMetric
 from monai.visualize import plot_2d_or_3d_image
 
+
+
 from catalyst import dl
 
 monai.config.print_config()
@@ -121,3 +123,20 @@ class MonaiSupervisedRunner(dl.SupervisedRunner):
       output = {self.output_key: sliding_window_inference(batch[self.input_key], roi_size, sw_batch_size, self.model)}
       output = {**output, **batch}
     return output
+
+runner = MonaiSupervisedRunner(input_key="img", input_target_key="seg", output_key="logits")  # you can also specify `device` here
+runner.train(
+    loaders={"train": train_loader, "valid": val_loader},
+    model=model,
+    criterion=loss_function,
+    optimizer=optimizer,
+    num_epochs=6, logdir="./logs", 
+    main_metric="dice_metric", minimize_metric=False,
+    verbose=False, timeit=True,  # let's use minimal logs, but with time checkers
+    callbacks={
+        "loss": dl.CriterionCallback(input_key="seg", output_key="logits"),
+        "periodic_valid": dl.PeriodicLoaderCallback(valid=2),
+        "dice_metric": dl.MetricCallback(prefix="dice_metric", metric_fn=dice_metric, input_key="seg", output_key="logits")
+    },
+    load_best_on_end=True,  # user-friendly API :)
+)

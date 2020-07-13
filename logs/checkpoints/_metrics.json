@@ -1,0 +1,98 @@
+{
+  "best": {
+    "loss": 0.5464520692825318,
+    "dice_metric": 0.9279115527868272,
+    "_timer/data_time": 0.06882199048995971,
+    "_timer/model_time": 0.036824059486389164,
+    "_timer/batch_time": 0.10565671920776368,
+    "_timer/_fps": 11.520512077889048
+  },
+  "last": {
+    "loss": 0.5464520692825318,
+    "dice_metric": 0.9279115527868272,
+    "_timer/data_time": 0.06882199048995971,
+    "_timer/model_time": 0.036824059486389164,
+    "_timer/batch_time": 0.10565671920776368,
+    "_timer/_fps": 11.520512077889048
+  },
+  "train.6": {
+    "loss": 0.5464520692825318,
+    "dice_metric": 0.9279115527868272,
+    "_timer/data_time": 0.06882199048995971,
+    "_timer/model_time": 0.036824059486389164,
+    "_timer/batch_time": 0.10565671920776368,
+    "_timer/_fps": 11.520512077889048
+  },
+  "epoch_0": [
+    "logs/checkpoints/train.1.pth",
+    -Infinity,
+    {
+      "loss": 0.48811420798301697,
+      "dice_metric": -Infinity,
+      "_timer/data_time": 0.42624201774597165,
+      "_timer/model_time": 0.044062566757202146,
+      "_timer/batch_time": 0.47031214237213137,
+      "_timer/_fps": 18.6606247743082
+    }
+  ],
+  "epoch_1": [
+    "logs/checkpoints/train.2.pth",
+    0.8564346432685853,
+    {
+      "loss": 0.5949773371219637,
+      "dice_metric": 0.8564346432685853,
+      "_timer/data_time": 0.07058223485946655,
+      "_timer/model_time": 0.036829090118408195,
+      "_timer/batch_time": 0.10742075443267822,
+      "_timer/_fps": 11.761053502434557
+    }
+  ],
+  "epoch_2": [
+    "logs/checkpoints/train.3.pth",
+    -Infinity,
+    {
+      "loss": 0.41538606584072113,
+      "dice_metric": -Infinity,
+      "_timer/data_time": 0.39428699016571045,
+      "_timer/model_time": 0.04105641841888427,
+      "_timer/batch_time": 0.4353502273559571,
+      "_timer/_fps": 19.414487537552805
+    }
+  ],
+  "epoch_3": [
+    "logs/checkpoints/train.4.pth",
+    0.9077961534261704,
+    {
+      "loss": 0.5683864921331405,
+      "dice_metric": 0.9077961534261704,
+      "_timer/data_time": 0.06831306219100952,
+      "_timer/model_time": 0.03666218519210816,
+      "_timer/batch_time": 0.10498325824737549,
+      "_timer/_fps": 12.896463241670189
+    }
+  ],
+  "epoch_4": [
+    "logs/checkpoints/train.5.pth",
+    -Infinity,
+    {
+      "loss": 0.38308667838573457,
+      "dice_metric": -Infinity,
+      "_timer/data_time": 0.3946017503738404,
+      "_timer/model_time": 0.04116778373718262,
+      "_timer/batch_time": 0.435777735710144,
+      "_timer/_fps": 19.53727113323302
+    }
+  ],
+  "epoch_5": [
+    "logs/checkpoints/train.6.pth",
+    0.9279115527868272,
+    {
+      "loss": 0.5464520692825318,
+      "dice_metric": 0.9279115527868272,
+      "_timer/data_time": 0.06882199048995971,
+      "_timer/model_time": 0.036824059486389164,
+      "_timer/batch_time": 0.10565671920776368,
+      "_timer/_fps": 11.520512077889048
+    }
+  ]
+}
