@@ -36,6 +36,10 @@ tempdir = '/data/mialab/users/washbee/tempdata'
 print("generating synthetic data to {tempdir} (this may take a while)")
 for i in range(40):
     im, seg = create_test_image_3d(128, 128, 128, num_seg_classes=1, channel_dim=-1)
+    print(type(im))
+    print(im.shape)
+    break
+    
     n = nib.Nifti1Image(im, np.eye(4))
     #print (os.path.join(tempdir, f"img{i:d}.nii.gz"))
     #break

@@ -20,7 +20,7 @@ from monai.transforms import (
     RandRotate90d,
     ToTensord,
 )
-from monai.data import create_test_image_3d, list_data_collate
+from monai.data import create_test_image_2d, list_data_collate
 from monai.inferers import sliding_window_inference
 from monai.metrics import DiceMetric
 from monai.visualize import plot_2d_or_3d_image
@@ -35,11 +35,13 @@ logging.basicConfig(stream=sys.stdout, level=logging.INFO)
 tempdir = '/data/mialab/users/washbee/tempdata'
 print("generating synthetic data to {tempdir} (this may take a while)")
 for i in range(40):
-    im, seg = create_test_image_3d(128, 128, 128, num_seg_classes=1, channel_dim=-1)
+    im, seg = create_test_image_2d(128, 128, num_seg_classes=1, channel_dim=-1)
+    print(type(im))
+    print(im.shape)
+    
     n = nib.Nifti1Image(im, np.eye(4))
-    #print (os.path.join(tempdir, f"img{i:d}.nii.gz"))
-    #break
     nib.save(n, os.path.join(tempdir, f"img{i:d}.nii.gz"))
+    print (os.path.join(tempdir, f"img{i:d}.nii.gz"))
     n = nib.Nifti1Image(seg, np.eye(4))
     nib.save(n, os.path.join(tempdir, f"seg{i:d}.nii.gz"))
 images = sorted(glob(os.path.join(tempdir, "img*.nii.gz")))
