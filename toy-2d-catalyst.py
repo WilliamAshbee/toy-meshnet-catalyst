@@ -10,7 +10,7 @@ from CirclesLoad import CirclesLoad
 from customcriterion import CustomCriterion
 
 print('data')
-mini_batch = 32
+mini_batch = 512
 size = (32, 32)
 parser = argparse.ArgumentParser()
 
@@ -45,8 +45,8 @@ img_tf = transforms.Compose(
 parser.add_argument('--root', type=str, default='/data/mialab/users/washbee/circles/')
 args = parser.parse_args()
 
-dataset_train = CirclesLoad(args.root,  img_tf, 'train')
-dataset_val = CirclesLoad(args.root,  img_tf, 'val')
+dataset_train = CirclesLoad(args.root,  img_tf, 'train',1000)
+dataset_val = CirclesLoad(args.root,  img_tf, 'val',1000)
 
 loader_train = data.DataLoader(
     dataset_train, batch_size=mini_batch,
@@ -61,12 +61,6 @@ loader_val = data.DataLoader(
 loaders = {"train": loader_train, "valid": loader_val}
 
 print('model')
-
-def my_loss(logits, gtlbls):
-    assert logits.shape[0] == mini_batch
-    loss =  torch.mean(torch.abs(logits-gtlbls))
-    return loss
-
 
 # model, criterion, optimizer, scheduler
 model = vgg13().cuda()

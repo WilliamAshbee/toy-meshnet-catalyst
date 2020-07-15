@@ -7,7 +7,8 @@ import numpy as np
 import csv
 class CirclesLoad(torch.utils.data.Dataset):
     def __init__(self, img_root, img_transform,
-                 split='train'):
+                 split='train', numExamples = None):
+        super(CirclesLoad, self).__init__()
         self.myvals = None
         with open('/home/users/washbee1/projects/toy-meshnet-problem/labels.csv',mode = 'r') as infile:
             reader = csv.reader(infile)
@@ -28,7 +29,6 @@ class CirclesLoad(torch.utils.data.Dataset):
             
             self.myvals = myvals
 
-        super(CirclesLoad, self).__init__()
         self.img_transform = img_transform
         # use about 8M images in the challenge dataset
         self.paths = glob('{:s}*.png'.format(img_root))
