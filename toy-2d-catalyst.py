@@ -1,7 +1,7 @@
 import torch
 from torch.utils.data import DataLoader, TensorDataset
 from catalyst import dl
-
+import numpy as np
 print('data')
 # data
 num_samples, num_features = int(1e4), int(1e1)
@@ -22,14 +22,38 @@ print ('training')
 
 # model training
 runner = dl.SupervisedRunner()
+logdir = './logdir'
 runner.train(
     model=model,
     criterion=criterion,
     optimizer=optimizer,
     scheduler=scheduler,
     loaders=loaders,
-    logdir="./logdir",
+    logdir=logdir,
     num_epochs=8,
     verbose=True,
     callbacks=[dl.BatchOverfitCallback(train=10, valid=0.5)]
 )
+
+runner.valid_metrics = {"loss": criterion}
+runnerpredictions = np.vstack(list(map(
+    lambda x: x["logits"].cpu().numpy(), 
+    runner.predict_loader(loader=loaders["valid"], resume=f"{logdir}/checkpoints/best.pth")
+)))
+
+print(runnerpredictions.shape)
+
+secondRunnerPredictions = list(
+    map(
+        lambda x:x, 
+        loaders["valid"]
+        )
+    )
+
+for el in secondRunnerPredictions:
+    print(el)
+    print(type(el))
+    break
+
+
+print(len(secondRunnerPredictions))
