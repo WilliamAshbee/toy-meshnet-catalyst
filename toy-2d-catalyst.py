@@ -5,7 +5,9 @@ import numpy as np
 print('data')
 # data
 num_samples, num_features = int(1e4), int(1e1)
+print ('num',num_samples,num_features)
 X, y = torch.rand(num_samples, num_features), torch.rand(num_samples)
+print (X.shape, y.shape)
 dataset = TensorDataset(X, y)
 loader = DataLoader(dataset, batch_size=32, num_workers=1)
 loaders = {"train": loader, "valid": loader}
@@ -30,7 +32,7 @@ runner.train(
     scheduler=scheduler,
     loaders=loaders,
     logdir=logdir,
-    num_epochs=8,
+    num_epochs=1,
     verbose=True,
     callbacks=[dl.BatchOverfitCallback(train=10, valid=0.5)]
 )
@@ -51,8 +53,10 @@ secondRunnerPredictions = list(
     )
 
 for el in secondRunnerPredictions:
-    print(el)
-    print(type(el))
+    print('el0', el[0].shape)
+    print('el1', el[1].shape)
+    print('len el', len(el))
+    print('model',model(el[0]).shape)
     break
 
 
