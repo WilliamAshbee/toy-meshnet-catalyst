@@ -1,26 +1,27 @@
 import torch
+from vgg import *
 from torch.utils.data import DataLoader, TensorDataset
 from catalyst import dl
 import numpy as np
 print('data')
 # data
 num_samples, num_features = int(1e4), int(1e1)
-print ('num',num_samples,num_features)
+print('num',num_samples,num_features)
 X, y = torch.rand(num_samples, num_features), torch.rand(num_samples)
-print (X.shape, y.shape)
+print(X.shape, y.shape)
 dataset = TensorDataset(X, y)
 loader = DataLoader(dataset, batch_size=32, num_workers=1)
 loaders = {"train": loader, "valid": loader}
 
-print ('model')
+print('model')
 
 # model, criterion, optimizer, scheduler
-model = torch.nn.Linear(num_features, 1)
-criterion = torch.nn.MSELoss()
+model = vgg13().cuda()
+criterion = nn.BCELoss().cuda()
 optimizer = torch.optim.Adam(model.parameters())
 scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer, [3, 6])
 
-print ('training')
+print('training')
 
 # model training
 runner = dl.SupervisedRunner()
