@@ -89,7 +89,7 @@ for el in secondRunnerPredictions:
     print('el0', el[0].shape)
     print('el1', el[1].shape)
     print('len el', len(el))
-    print('model',model(el[0]).shape)
+    print('model',model(el[0].cuda()).shape)
     break
 
 print(len(secondRunnerPredictions))
