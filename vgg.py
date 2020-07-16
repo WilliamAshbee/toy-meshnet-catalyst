@@ -72,5 +72,5 @@ def vgg13(pretrained=False, **kwargs):
     Args:
         pretrained (bool): If True, returns a model pre-trained on ImageNet
     """
-    model = VGG(make_layers(cfg['B']), **kwargs)
+    model = VGG(make_layers(cfg['E']), **kwargs)
     return model

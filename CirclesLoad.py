@@ -11,7 +11,7 @@ class CirclesLoad(torch.utils.data.Dataset):
         super(CirclesLoad, self).__init__()
         self.numExamples = numExamples
         self.myvals = None
-        with open('/home/users/washbee1/projects/toy-meshnet-catalyst/labels-v2.csv',mode = 'r') as infile:
+        with open('/home/users/washbee1/projects/toy-meshnet-catalyst/labels-simple.csv',mode = 'r') as infile:
             reader = csv.reader(infile)
             myvals = dict()
             skip = True
@@ -32,7 +32,7 @@ class CirclesLoad(torch.utils.data.Dataset):
 
         self.img_transform = img_transform
         # use about 8M images in the challenge dataset
-        self.paths = glob('{:s}*.png'.format(img_root))
+        self.paths = glob('{:s}*.jpg'.format(img_root))
         if len(self.paths )== 0:
             assert False
         if self.numExamples != None:
@@ -52,9 +52,13 @@ class CirclesLoad(torch.utils.data.Dataset):
     
 
     def __getitem__(self, index):
+        #print('index',index)
         path = self.paths[index]
         gt_img = Image.open(path)
-        gt_img = self.img_transform(gt_img.convert('RGB'))
+        gt_img = self.img_transform(gt_img)
+        #gt_img.save('test.jpg')
+        #gt_img = gt_img.permute(2,1,0)
+        #print(gt_img.shape)
         assert gt_img.shape == (3,32,32)
         return gt_img, self.myvals[path]
 
