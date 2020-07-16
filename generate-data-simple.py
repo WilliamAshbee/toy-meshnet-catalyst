@@ -8,14 +8,14 @@ with open('labels-simple.csv', 'w', newline='') as file:
     writer = csv.writer(file)
     writer.writerow(["Filename", "i", "x","y","r"])
                 
-    for i in range(200):
+    for i in range(2000):
         if i % 100 == 0:
             print(i)
         fig = plt.figure()
 
-        x = random.uniform(.4, .6)
-        y = random.uniform(.4, .6)
-        r = random.uniform(.2, .3)
+        x = random.uniform(.2, .8)
+        y = random.uniform(.2, .8)
+        r = random.uniform(.2, .8)
         name = "circleixyr_{}_{:.3f}_{:.3f}_{:.3f}".format(i,x,y,r)
         e = Circle( xy=(x, y), radius= r )
         ax = plt.gca()  # ax = subplot( 1,1,1 )

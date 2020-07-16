@@ -16,8 +16,6 @@ mini_batch = 100
 size = (32, 32)
 parser = argparse.ArgumentParser()
 
-finiteS = 1000
-stats = False
 
 img_tf = transforms.Compose(
     [
@@ -74,6 +72,7 @@ runner.train(
     verbose=True,
     callbacks=[dl.BatchOverfitCallback(train=10, valid=10)]
 )
+
 print("finished running")
 
 stats = True
@@ -102,7 +101,6 @@ for el in secondRunnerPredictions:
     
     print(a)
     print(a.shape)
-    #img = Image.fromarray(a, 'RGB')
     a = a.to(torch.device("cpu"))
     img = topil_tf(a)
     print (type(img))
