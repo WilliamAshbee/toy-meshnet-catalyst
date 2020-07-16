@@ -9,8 +9,9 @@ class CirclesLoad(torch.utils.data.Dataset):
     def __init__(self, img_root, img_transform,
                  split='train', numExamples = None):
         super(CirclesLoad, self).__init__()
+        self.numExamples = numExamples
         self.myvals = None
-        with open('/home/users/washbee1/projects/toy-meshnet-problem/labels.csv',mode = 'r') as infile:
+        with open('/home/users/washbee1/projects/toy-meshnet-catalyst/labels-v2.csv',mode = 'r') as infile:
             reader = csv.reader(infile)
             myvals = dict()
             skip = True
@@ -34,6 +35,9 @@ class CirclesLoad(torch.utils.data.Dataset):
         self.paths = glob('{:s}*.png'.format(img_root))
         if len(self.paths )== 0:
             assert False
+        if self.numExamples != None:
+            self.paths = self.paths[:self.numExamples-1]
+            print("length", len(self.paths))
         if split == 'train' :
             self.paths = self.paths[:(int)(len(self.paths)*.8)]
         else:
