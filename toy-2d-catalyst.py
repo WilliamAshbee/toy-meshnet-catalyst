@@ -85,11 +85,22 @@ secondRunnerPredictions = list(
         )
     )
 print('end of map')
+from PIL import Image
+import numpy as np
+
 for el in secondRunnerPredictions:
     print('el0', el[0].shape)
     print('el1', el[1].shape)
     print('len el', len(el))
     print('model',model(el[0].cuda()).shape)
+    a = el[0][0,:,:,:]
+    a = a.reshape((32,32,3))
+    a = a.numpy()
+    print(a)
+    print(a.shape)
+    img = Image.fromarray(a, 'RGB')
+    img.save('my.png')
+
     break
 
 print(len(secondRunnerPredictions))
