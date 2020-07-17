@@ -8,7 +8,7 @@ with open('labels-simple.csv', 'w', newline='') as file:
     writer = csv.writer(file)
     writer.writerow(["Filename", "i", "x","y","r"])
                 
-    for i in range(2000):
+    for i in range(400):
         if i % 100 == 0:
             print(i)
         fig = plt.figure()
