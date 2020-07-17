@@ -2,8 +2,6 @@ import torch
 import numpy as np
 import pylab as plt
 
-
-
 def circle_matrix(radius=10, side=256, w=60):
     xx, yy = torch.meshgrid(torch.arange(side),torch.arange(side))
     xx = xx.cuda()
@@ -26,7 +24,7 @@ def plot_all(R=5, side=32, w=10):
 
 class DonutDataset(torch.utils.data.Dataset):
     """Donut dataset."""
-    
+
     def __init__(self, length = None):
         """
         Args:
@@ -48,14 +46,15 @@ class DonutDataset(torch.utils.data.Dataset):
         w=10
         map = circle_matrix(radius=2*R, side=side, w=w)
         return map['donut']
+    
+    @staticmethod
+    def displayDonuts(dataset):
+        for i in range(100):
+            sample = dataset[i]
+            plt.subplot(10,10,i+1)
+            plot_all(R=np.random.randint(30))
+            plt.axis('off')
+        plt.savefig('finalplot.jpg')
 
-
-dataset = DonutDataset(length = 1024)
-
-
-for i in range(100):
-    sample = dataset[i]
-    plt.subplot(10,10,i+1)
-    plot_all(R=np.random.randint(30))
-    plt.axis('off')
-plt.savefig('finalplot.jpg')
+#dataset = DonutDataset(length = 1024)
+#DonutDataset.displayDonuts(dataset)
