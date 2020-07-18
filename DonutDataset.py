@@ -2,20 +2,25 @@ import torch
 import numpy as np
 import pylab as plt
 
-def circle_matrix(radius=10, side=256, w=60):
+def circle_matrix( ):
+    side=32
+    radiusMax=10
+    w = 1
+    radius = np.random.randint(1,radiusMax)
+    
     xx, yy = torch.meshgrid(torch.arange(side),torch.arange(side))
     xx = xx
     yy = yy
     x = np.random.randint(side)
     y = np.random.randint(side)
     circle = (xx - x) ** 2 + (yy - y) ** 2
-    R = radius**2/4
-    w = 600/6400*R
-    donut = torch.logical_and(circle < (R + w), circle > (R - w))
+    R2 = (radius-w)**2
+    R1 = (radius+w)**2
+    donut = torch.logical_and(circle < R1, circle > R2)
     values = {'donut': donut, 'x': x, 'y': y, 'radius':radius}
     return values
 
-def plot_all(R=5, side=32, w=10,sample = None, model = None):
+def plot_all( sample = None, model = None):
     img = sample[0,:,:].squeeze().cpu().numpy()
     plt.imshow(img, cmap=plt.cm.gray_r)
     map = model(sample.unsqueeze(0).cuda())
@@ -42,10 +47,7 @@ class DonutDataset(torch.utils.data.Dataset):
 
 
     def __getitem__(self, idx):
-        R=5
-        side=32
-        w=10
-        map = circle_matrix(radius=2*R, side=side, w=w)
+        map = circle_matrix()
         out = [map['x'],map['y'],map['radius']]
         result = map['donut'].repeat(3, 1, 1).float()
         assert result.shape == (3,32,32)

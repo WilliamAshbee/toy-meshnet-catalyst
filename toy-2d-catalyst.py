@@ -37,6 +37,7 @@ args = parser.parse_args()
 dataset_train = DonutDataset(2048)
 dataset_val = DonutDataset(2048)
 
+
 loader_train = data.DataLoader(
     dataset_train, batch_size=mini_batch,
     sampler=RandomSampler(data_source = dataset_train),
