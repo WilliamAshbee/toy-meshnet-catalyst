@@ -10,6 +10,9 @@ from CirclesLoad import CirclesLoad
 from DonutDataset import DonutDataset
 from customcriterion import CustomCriterion
 import torchvision.transforms.functional as F
+import os
+os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"   # see issue #152
+os.environ["CUDA_VISIBLE_DEVICES"]="0"
 
 print('data')
 mini_batch = 100
@@ -34,8 +37,8 @@ args = parser.parse_args()
 
 #dataset_train = CirclesLoad(args.root,  img_tf, 'train',None)
 #dataset_val = CirclesLoad(args.root,  img_tf, 'val',None)
-dataset_train = DonutDataset(2048)
-dataset_val = DonutDataset(2048)
+dataset_train = DonutDataset(256*32)
+dataset_val = DonutDataset(256)
 
 
 loader_train = data.DataLoader(
@@ -70,7 +73,7 @@ runner.train(
     scheduler=scheduler,
     loaders=loaders,
     logdir=logdir,
-    num_epochs=10,
+    num_epochs=15,
     verbose=True,
     callbacks=[dl.BatchOverfitCallback(train=10, valid=10)]
 )

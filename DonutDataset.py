@@ -2,7 +2,8 @@ import torch
 import numpy as np
 import pylab as plt
 
-def circle_matrix( ):
+
+def circle_matrix():
     side=32
     radiusMax=10
     w = 1
