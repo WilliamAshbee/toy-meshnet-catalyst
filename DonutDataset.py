@@ -15,10 +15,11 @@ def circle_matrix(radius=10, side=256, w=60):
     values = {'donut': donut, 'x': x, 'y': y, 'radius':radius}
     return values
 
-def plot_all(R=5, side=32, w=10):
-    result = circle_matrix(radius=2*R, side=side, w=w)
-    plt.imshow(result['donut'].cpu().numpy(), cmap=plt.cm.gray_r)
-    a_circle = plt.Circle((result['y'], result['x']), R, edgecolor='r', facecolor=None, fill=False)
+def plot_all(R=5, side=32, w=10,sample = None, model = None):
+    img = sample[0,:,:].squeeze().cpu().numpy()
+    plt.imshow(img, cmap=plt.cm.gray_r)
+    map = model(sample.unsqueeze(0).cuda())
+    a_circle = plt.Circle((map[0,1], map[0,0]), map[0,2], edgecolor='r', facecolor=None, fill=False)
     plt.gca().add_artist(a_circle)
 
 
@@ -51,11 +52,11 @@ class DonutDataset(torch.utils.data.Dataset):
         return result, torch.FloatTensor(out)
     
     @staticmethod
-    def displayDonuts(dataset):
+    def displayDonuts(dataset, model):
         for i in range(100):
             sample, _ = dataset[i]
             plt.subplot(10,10,i+1)
-            plot_all(R=np.random.randint(30))
+            plot_all(sample = sample,model=model)
             plt.axis('off')
         plt.savefig('finalplot.jpg')
 

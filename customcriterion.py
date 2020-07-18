@@ -7,5 +7,6 @@ class CustomCriterion(_Loss):
         super(CustomCriterion, self).__init__(size_average, reduce, reduction)
 
     def forward(self, input, target):
+        assert input.shape == target.shape
         loss = torch.mean(torch.abs(input-target))
         return loss

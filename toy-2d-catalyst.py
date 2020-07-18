@@ -69,8 +69,10 @@ runner.train(
     scheduler=scheduler,
     loaders=loaders,
     logdir=logdir,
-    num_epochs=1,
+    num_epochs=10,
     verbose=True,
     callbacks=[dl.BatchOverfitCallback(train=10, valid=10)]
 )
 
+
+DonutDataset.displayDonuts(dataset_val,model)
