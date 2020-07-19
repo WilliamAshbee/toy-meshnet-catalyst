@@ -10,10 +10,18 @@ def circle_matrix():
     radius = np.random.randint(1,radiusMax)
     sigmas = [None, 1, 2, 3, 4, 5]
     sigma=sigmas[np.random.randint(len(sigmas))]
-    
+
     xx, yy = np.mgrid[:side, :side]
-    x = np.random.randint(side)
-    y = np.random.randint(side)
+    x = np.random.randint(radius, side - radius)
+    y = np.random.randint(radius, side - radius)
+    #print('xyr',x,y,radius)
+    assert x+radius <= side
+    assert y+radius <= side
+    assert x-radius >= 0
+    assert y-radius >= 0
+    
+    #x = np.random.randint(side)
+    #y = np.random.randint(side)
     circle = (xx - x) ** 2 + (yy - y) ** 2
     R2 = (radius-w)**2
     R1 = (radius+w)**2
@@ -69,7 +77,7 @@ class DonutDataset(torch.utils.data.Dataset):
             plt.subplot(10,10,i+1)
             plot_all(sample = sample,model=model)
             plt.axis('off')
-        plt.savefig('finalplot.jpg')
+        plt.savefig('finalplot.png')
 
 #dataset = DonutDataset(length = 1024)
 #DonutDataset.displayDonuts(dataset)
