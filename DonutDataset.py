@@ -10,7 +10,7 @@ def circle_matrix():
     radius = np.random.randint(1,radiusMax)
     sigmas = [None, 1, 2, 3, 4, 5]
     sigma=sigmas[np.random.randint(len(sigmas))]
-
+    
     xx, yy = np.mgrid[:side, :side]
     x = np.random.randint(side)
     y = np.random.randint(side)
@@ -34,7 +34,6 @@ def plot_all( sample = None, model = None):
 
 class DonutDataset(torch.utils.data.Dataset):
     """Donut dataset."""
-
     def __init__(self, length = None):
         """
         Args:
