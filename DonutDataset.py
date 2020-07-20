@@ -12,16 +12,14 @@ def circle_matrix():
     sigma=sigmas[np.random.randint(len(sigmas))]
 
     xx, yy = np.mgrid[:side, :side]
-    x = np.random.randint(radius, side - radius)
-    y = np.random.randint(radius, side - radius)
+    x = np.random.randint(radius+1, side - radius-1)
+    y = np.random.randint(radius+1, side - radius-1)
     #print('xyr',x,y,radius)
     assert x+radius <= side
     assert y+radius <= side
     assert x-radius >= 0
     assert y-radius >= 0
     
-    #x = np.random.randint(side)
-    #y = np.random.randint(side)
     circle = (xx - x) ** 2 + (yy - y) ** 2
     R2 = (radius-w)**2
     R1 = (radius+w)**2

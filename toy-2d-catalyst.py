@@ -15,7 +15,7 @@ os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"   # see issue #152
 os.environ["CUDA_VISIBLE_DEVICES"]="0"
 
 print('data')
-mini_batch = 100
+mini_batch = 200
 size = (32, 32)
 parser = argparse.ArgumentParser()
 
@@ -37,7 +37,7 @@ args = parser.parse_args()
 
 #dataset_train = CirclesLoad(args.root,  img_tf, 'train',None)
 #dataset_val = CirclesLoad(args.root,  img_tf, 'val',None)
-dataset_train = DonutDataset(256*32)
+dataset_train = DonutDataset(256*64)
 dataset_val = DonutDataset(256)
 
 
@@ -58,8 +58,8 @@ print('model')
 # model, criterion, optimizer, scheduler
 model = vgg13().cuda()
 criterion = CustomCriterion().cuda()
-optimizer = torch.optim.Adam(model.parameters())
-scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer, [3, 6])
+optimizer = torch.optim.Adam(model.parameters(),lr=0.0001)
+scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer,milestones =  [6, 12,18,24,30], gamma = .5)
 
 print('training')
 
@@ -73,7 +73,7 @@ runner.train(
     scheduler=scheduler,
     loaders=loaders,
     logdir=logdir,
-    num_epochs=15,
+    num_epochs=60,
     verbose=True,
     callbacks=[dl.BatchOverfitCallback(train=10, valid=10)]
 )
