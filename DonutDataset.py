@@ -8,12 +8,12 @@ def circle_matrix():
     radiusMax=10
     w = 1
     radius = np.random.randint(1,radiusMax)
-    sigmas = [None, 1, 2, 3, 4, 5]
+    sigmas = [None, 1]
     sigma=sigmas[np.random.randint(len(sigmas))]
 
     xx, yy = np.mgrid[:side, :side]
-    x = np.random.randint(radius+1, side - radius-1)
-    y = np.random.randint(radius+1, side - radius-1)
+    x = np.random.randint(radius+5, side - radius-5)
+    y = np.random.randint(radius+5, side - radius-5)
     #print('xyr',x,y,radius)
     assert x+radius <= side
     assert y+radius <= side

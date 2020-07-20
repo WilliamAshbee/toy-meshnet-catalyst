@@ -8,5 +8,7 @@ class CustomCriterion(_Loss):
 
     def forward(self, input, target):
         assert input.shape == target.shape
-        loss = torch.sqrt(torch.sum(torch.square(input-target)))
-        return loss
+        loss = 2.0*torch.sum(torch.square(input[:,0]-target[:,0]))
+        loss += 2.0*torch.sum(torch.square(input[:,1]-target[:,1]))
+        loss += torch.sum(torch.square(input[:,2]-target[:,2]))
+        return torch.sqrt(loss)
