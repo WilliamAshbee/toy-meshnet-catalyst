@@ -30,23 +30,40 @@ def circle_matrix():
     return {'donut': donut, 'x': x, 'y': y, 'radius':radius}
 
 
-def plot_all( sample = None, model = None, labels = None):
+def plot_all( sample = None, model = None, labels = None, circle = False):
     img = sample[0,:,:].squeeze().cpu().numpy()
     plt.imshow(img, cmap=plt.cm.gray_r)
-    if model != None:
-        map = model(sample.unsqueeze(0).cuda())
-    if model != None:
-        x = map[0,0]
-        y = map[0,1]
-        r = map[0,2]
-    elif label != None:
-        x = labels[0]
-        y = labels[1]
-        r = labels[2]
+    if circle:
+        if model != None:
+            map = model(sample.unsqueeze(0).cuda())
+        if model != None:
+            x = map[0,0]
+            y = map[0,1]
+            r = map[0,2]
+        elif label != None:
+            x = labels[0]
+            y = labels[1]
+            r = labels[2]
+        else:
+            assert False,"Need eith model or gt labels"
+        a_circle = plt.Circle((y, x), r, edgecolor='r', facecolor=None, fill=False)
+        plt.gca().add_artist(a_circle)
     else:
-        assert False,"Need eith model or gt labels"
-    a_circle = plt.Circle((y, x), r, edgecolor='r', facecolor=None, fill=False)
-    plt.gca().add_artist(a_circle)
+        if model != None:
+            with torch.no_grad():
+                pred = model(sample.unsqueeze(0).cuda())
+                xpred = pred[:,:3]
+                #assert xpred.shape == (batchsize,3)
+                ypred = pred[:,-3:]
+                #assert ypred.shape == (batchsize,3)
+                X = xpred.flatten().cpu().numpy()
+                Y = ypred.flatten().cpu().numpy()
+                assert X.shape[0] == 3
+                assert Y.shape[0] == 3
+                # Plotting point using sactter method
+                ascatter = plt.scatter(X,Y,s = [.1,.1,.1])
+                #a_circle = plt.Circle((y, x), r, edgecolor='r', facecolor=None, fill=False)
+                plt.gca().add_artist(ascatter)
 
 
 class DonutDataset(torch.utils.data.Dataset):
