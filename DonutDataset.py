@@ -35,14 +35,16 @@ def plot_all( sample = None, model = None, labels = None):
     plt.imshow(img, cmap=plt.cm.gray_r)
     if model != None:
         map = model(sample.unsqueeze(0).cuda())
-    if labels == None:
+    if model != None:
         x = map[0,0]
         y = map[0,1]
         r = map[0,2]
-    else:
+    elif label != None:
         x = labels[0]
         y = labels[1]
         r = labels[2]
+    else:
+        assert False,"Need eith model or gt labels"
     a_circle = plt.Circle((y, x), r, edgecolor='r', facecolor=None, fill=False)
     plt.gca().add_artist(a_circle)
 
