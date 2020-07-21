@@ -30,11 +30,20 @@ def circle_matrix():
     return {'donut': donut, 'x': x, 'y': y, 'radius':radius}
 
 
-def plot_all( sample = None, model = None):
+def plot_all( sample = None, model = None, labels = None):
     img = sample[0,:,:].squeeze().cpu().numpy()
     plt.imshow(img, cmap=plt.cm.gray_r)
-    map = model(sample.unsqueeze(0).cuda())
-    a_circle = plt.Circle((map[0,1], map[0,0]), map[0,2], edgecolor='r', facecolor=None, fill=False)
+    if model != None:
+        map = model(sample.unsqueeze(0).cuda())
+    if labels == None:
+        x = map[0,0]
+        y = map[0,1]
+        r = map[0,2]
+    else:
+        x = labels[0]
+        y = labels[1]
+        r = labels[2]
+    a_circle = plt.Circle((y, x), r, edgecolor='r', facecolor=None, fill=False)
     plt.gca().add_artist(a_circle)
 
 
@@ -71,11 +80,11 @@ class DonutDataset(torch.utils.data.Dataset):
     @staticmethod
     def displayDonuts(dataset, model):
         for i in range(100):
-            sample, _ = dataset[i]
+            sample, labels = dataset[i]
             plt.subplot(10,10,i+1)
-            plot_all(sample = sample,model=model)
+            plot_all(sample = sample,model=model, labels = labels)
             plt.axis('off')
         plt.savefig('finalplot.png')
 
-#dataset = DonutDataset(length = 1024)
-#DonutDataset.displayDonuts(dataset)
+dataset = DonutDataset(length = 1024)
+DonutDataset.displayDonuts(dataset, model = None)
