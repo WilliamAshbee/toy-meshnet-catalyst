@@ -86,5 +86,5 @@ class DonutDataset(torch.utils.data.Dataset):
             plt.axis('off')
         plt.savefig('finalplot.png')
 
-dataset = DonutDataset(length = 1024)
-DonutDataset.displayDonuts(dataset, model = None)
+#dataset = DonutDataset(length = 1024)
+#DonutDataset.displayDonuts(dataset, model = None)

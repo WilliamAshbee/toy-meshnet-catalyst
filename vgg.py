@@ -1,9 +1,25 @@
 import torch.nn as nn
 import math
-
+import torch
 __all__ = [
     'VGG', 'vgg13',
 ]
+
+x_encoding = torch.ones((32,32)).float().cuda()
+y_encoding = torch.ones((32,32)).float().cuda()
+
+
+for i in range(32):
+    x_encoding[:,i-1] = (i)*2.0/31.0 - 1 
+    y_encoding[i-1,:] = (31-i)*2.0/31 - 1  
+
+
+#print(x_encoding[:,0])
+#print(y_encoding[0,:])
+
+x_encoding = x_encoding.unsqueeze(0).unsqueeze(0)
+y_encoding = y_encoding.unsqueeze(0).unsqueeze(0)
+
 
 class VGG(nn.Module):
     def __init__(self, features, num_classes=3):
@@ -21,7 +37,13 @@ class VGG(nn.Module):
         )
         self._initialize_weights()
 
+
     def forward(self, x):
+        assert x_encoding.shape == (1,1,32,32)
+        assert y_encoding.shape == (1,1,32,32)
+        
+        x = torch.cat([x, x_encoding.repeat(x.shape[0],1,1,1)], 1)
+        x = torch.cat([x, y_encoding.repeat(x.shape[0],1,1,1)], 1)
         features = self.features(x)
         x = features
         x = x.view(x.size(0), -1)
@@ -49,7 +71,7 @@ class VGG(nn.Module):
 
 def make_layers(cfg):
     layers = []
-    in_channels = 3
+    in_channels = 5
     for v in cfg:
         if v == 'M':
             layers += [nn.MaxPool2d(kernel_size=2, stride=2)]
