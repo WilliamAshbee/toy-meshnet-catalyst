@@ -14,6 +14,14 @@ def circle_matrix():
     xx, yy = np.mgrid[:side, :side]
     x = np.random.randint(radius+5, side - radius-5)
     y = np.random.randint(radius+5, side - radius-5)
+    a = torch.zeros((3,2))
+    a[0,0] = x-radius
+    a[1,0] = x+radius
+    a[2,0] = x
+    a[0,1] = y
+    a[1,1] = y
+    a[2,1] = y+radius
+    
     #print('xyr',x,y,radius)
     assert x+radius <= side
     assert y+radius <= side
@@ -27,16 +35,26 @@ def circle_matrix():
     if sigma is not None:
         donut = filters.gaussian(donut, sigma=(sigma, sigma))
     
-    return {'donut': donut, 'x': x, 'y': y, 'radius':radius}
+    return {'donut': donut, 'x': x, 'y': y, 'radius':radius, 'points':a}
 
 
 def plot_all( sample = None, model = None, labels = None, circle = False):
     img = sample[0,:,:].squeeze().cpu().numpy()
     plt.imshow(img, cmap=plt.cm.gray_r)
-    if circle:
+    with torch.no_grad():
+        pred = model(sample.unsqueeze(0).cuda())
+        xpred = pred[0,:3]
+        ypred = pred[0,-3:]
+        X = xpred.cpu().numpy()
+        Y = ypred.cpu().numpy()
+        assert X.shape == (3,)
+        assert Y.shape == (3,)
+        # Plotting point using sactter method
+        ascatter = plt.scatter(Y,X,s = [.3,.3,.3])
+        plt.gca().add_artist(ascatter)
+    """if circle:
         if model != None:
             map = model(sample.unsqueeze(0).cuda())
-        if model != None:
             x = map[0,0]
             y = map[0,1]
             r = map[0,2]
@@ -52,19 +70,28 @@ def plot_all( sample = None, model = None, labels = None, circle = False):
         if model != None:
             with torch.no_grad():
                 pred = model(sample.unsqueeze(0).cuda())
-                xpred = pred[:,:3]
-                #assert xpred.shape == (batchsize,3)
-                ypred = pred[:,-3:]
-                #assert ypred.shape == (batchsize,3)
-                X = xpred.flatten().cpu().numpy()
-                Y = ypred.flatten().cpu().numpy()
-                print(X,Y)
-                assert X.shape[0] == 3
-                assert Y.shape[0] == 3
+                xpred = pred[0,:3]
+                ypred = pred[0,-3:]
+                X = xpred.cpu().numpy()
+                Y = ypred.cpu().numpy()
+                assert X.shape == (3,)
+                assert Y.shape == (3,)
                 # Plotting point using sactter method
-                ascatter = plt.scatter(X,Y,s = [.2,.2,.2])
+                ascatter = plt.scatter(Y,X,s = [.2,.2,.2])
                 #a_circle = plt.Circle((y, x), r, edgecolor='r', facecolor=None, fill=False)
                 plt.gca().add_artist(ascatter)
+        else:
+            
+            X = labels[:,0].cpu().numpy()
+            Y = labels[:,1].cpu().numpy()
+            print(X,Y)
+            assert X.shape[0] == 3
+            assert Y.shape[0] == 3
+            # Plotting point using sactter method
+            ascatter = plt.scatter(Y,X,s = [.2,.2,.2])
+            #a_circle = plt.Circle((y, x), r, edgecolor='r', facecolor=None, fill=False)
+            plt.gca().add_artist(ascatter)
+    """
 
 
 class DonutDataset(torch.utils.data.Dataset):
@@ -86,7 +113,7 @@ class DonutDataset(torch.utils.data.Dataset):
 
     def __getitem__(self, idx):
         map = circle_matrix()
-        out = [map['x'],map['y'],map['radius']]
+        out = map['points']
         result = map['donut']
         assert result.shape == (32,32)
         result = np.reshape(result,(1,32,32))
