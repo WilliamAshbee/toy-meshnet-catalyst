@@ -20,7 +20,7 @@ class CustomCriterion(_Loss):
         loss_xy = (xgt-xpred)**2+(ygt-ypred)**2
         loss_xy = torch.sum(loss_xy)/(float)(batchsize)
 
-        rpred = input[:,-10:]
+        rpred = input[:,-numpoints:]
         rgt = target[:,-numpoints:]
         assert rpred.shape == (batchsize,numpoints)
         assert rgt.shape == (batchsize,numpoints)

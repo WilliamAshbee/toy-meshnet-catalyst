@@ -5,16 +5,16 @@ from skimage import filters
 import math
 def circle_matrix():
     side = 32
-    radiusMax=10
+    radiusMax=15
     w = 1
-    numpoints = 10
+    numpoints = 1000
     radius = np.random.randint(1,radiusMax)
     sigmas = [None, 1]
     sigma=sigmas[np.random.randint(len(sigmas))]
     
     xx, yy = np.mgrid[:side, :side]
-    x = np.random.randint(radius+5, side - radius-5)
-    y = np.random.randint(radius+5, side - radius-5)
+    x = np.random.randint(radius+1, side - radius-1)
+    y = np.random.randint(radius+1, side - radius-1)
     a = torch.zeros((numpoints+2,))
     a[0] = x
     a[1] = y
