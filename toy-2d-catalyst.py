@@ -73,7 +73,7 @@ runner.train(
     scheduler=scheduler,
     loaders=loaders,
     logdir=logdir,
-    num_epochs=25,
+    num_epochs=20,
     verbose=True,
     callbacks=[dl.BatchOverfitCallback(train=10, valid=10)]
 )

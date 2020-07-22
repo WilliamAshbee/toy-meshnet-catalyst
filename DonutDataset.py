@@ -10,23 +10,19 @@ def circle_matrix():
     radius = np.random.randint(1,radiusMax)
     sigmas = [None, 1]
     sigma=sigmas[np.random.randint(len(sigmas))]
-
+    
     xx, yy = np.mgrid[:side, :side]
     x = np.random.randint(radius+5, side - radius-5)
     y = np.random.randint(radius+5, side - radius-5)
-    a = torch.zeros((3,2))
-    a[0,0] = x-radius
-    a[1,0] = x+radius
-    a[2,0] = x
-    a[0,1] = y
-    a[1,1] = y
-    a[2,1] = y+radius
+    a = torch.zeros((6,))
+    a[0] = x
+    a[1] = y
+    a[2] = radius
+    a[3] = radius
+    a[4] = radius
+    a[5] = radius
     
     #print('xyr',x,y,radius)
-    assert x+radius <= side
-    assert y+radius <= side
-    assert x-radius >= 0
-    assert y-radius >= 0
     
     circle = (xx - x) ** 2 + (yy - y) ** 2
     R2 = (radius-w)**2
@@ -43,14 +39,48 @@ def plot_all( sample = None, model = None, labels = None, circle = False):
     plt.imshow(img, cmap=plt.cm.gray_r)
     with torch.no_grad():
         pred = model(sample.unsqueeze(0).cuda())
-        xpred = pred[0,:3]
-        ypred = pred[0,-3:]
+        assert pred.shape == (1,6)
+        xpred = pred[0,0].unsqueeze(0)
+        ypred = pred[0,1].unsqueeze(0)
+        assert xpred.shape == (1,)
+        assert ypred.shape == (1,)
+        rpred = pred[0,-4:]
+        assert rpred.shape == (4,)
+        xrfactors = torch.zeros_like(rpred)
+        yrfactors = torch.zeros_like(rpred)
+        xrfactors[0] = 0.0
+        xrfactors[1] = -1.0
+        xrfactors[2] = 0.0
+        xrfactors[3] = 1.0
+        yrfactors[0] = 1.0
+        yrfactors[1] = 0.0
+        yrfactors[2] = -1.0
+        yrfactors[3] = 0.0
+        #print(xpred,xrfactors.shape,rpred.shape)
+        #assert False
+        xpreds = xpred+xrfactors*rpred
+        assert xpreds.shape == (4,)
+        #assert False
+        ypreds = ypred+yrfactors*rpred
+        assert ypreds.shape == (4,)
+
+        #print (ypreds.shape)
+        #assert False
+        xpreds = xpreds.cpu().numpy()
+        assert xpreds.shape == (4,)
+        ypreds = ypreds.cpu().numpy()
+        assert ypreds.shape == (4,)
+        
         X = xpred.cpu().numpy()
         Y = ypred.cpu().numpy()
-        assert X.shape == (3,)
-        assert Y.shape == (3,)
+        #print(X.shape)
+        X = np.concatenate((X,xpreds),axis = 0)
+        Y = np.concatenate((Y,ypreds),axis = 0)
+        print(X)
+        assert X.shape == (5,)
+        assert Y.shape == (5,)
         # Plotting point using sactter method
-        ascatter = plt.scatter(Y,X,s = [.3,.3,.3])
+        ascatter = plt.scatter(Y,X,s = [.6,.6,.6,.6,.6],c = ['blue','red','red','red','red'])
         plt.gca().add_artist(ascatter)
     """if circle:
         if model != None:
