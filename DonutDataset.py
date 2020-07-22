@@ -58,10 +58,11 @@ def plot_all( sample = None, model = None, labels = None, circle = False):
                 #assert ypred.shape == (batchsize,3)
                 X = xpred.flatten().cpu().numpy()
                 Y = ypred.flatten().cpu().numpy()
+                print(X,Y)
                 assert X.shape[0] == 3
                 assert Y.shape[0] == 3
                 # Plotting point using sactter method
-                ascatter = plt.scatter(X,Y,s = [.1,.1,.1])
+                ascatter = plt.scatter(X,Y,s = [.2,.2,.2])
                 #a_circle = plt.Circle((y, x), r, edgecolor='r', facecolor=None, fill=False)
                 plt.gca().add_artist(ascatter)
 

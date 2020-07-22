@@ -37,7 +37,7 @@ args = parser.parse_args()
 
 #dataset_train = CirclesLoad(args.root,  img_tf, 'train',None)
 #dataset_val = CirclesLoad(args.root,  img_tf, 'val',None)
-dataset_train = DonutDataset(256*64)
+dataset_train = DonutDataset(256)
 dataset_val = DonutDataset(256)
 
 
@@ -58,7 +58,7 @@ print('model')
 # model, criterion, optimizer, scheduler
 model = vgg13().cuda()
 criterion = CustomCriterion().cuda()
-optimizer = torch.optim.Adam(model.parameters(),lr=0.0001)
+optimizer = torch.optim.Adam(model.parameters(),lr=0.001)
 scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer,milestones =  [6, 12,18,24,30], gamma = .5)
 
 print('training')
@@ -73,7 +73,7 @@ runner.train(
     scheduler=scheduler,
     loaders=loaders,
     logdir=logdir,
-    num_epochs=40,
+    num_epochs=30,
     verbose=True,
     callbacks=[dl.BatchOverfitCallback(train=10, valid=10)]
 )
