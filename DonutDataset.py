@@ -2,11 +2,12 @@ import torch
 import numpy as np
 import pylab as plt
 from skimage import filters
-
+import math
 def circle_matrix():
     side = 32
     radiusMax=10
     w = 1
+    numpoints = 10
     radius = np.random.randint(1,radiusMax)
     sigmas = [None, 1]
     sigma=sigmas[np.random.randint(len(sigmas))]
@@ -14,15 +15,10 @@ def circle_matrix():
     xx, yy = np.mgrid[:side, :side]
     x = np.random.randint(radius+5, side - radius-5)
     y = np.random.randint(radius+5, side - radius-5)
-    a = torch.zeros((6,))
+    a = torch.zeros((numpoints+2,))
     a[0] = x
     a[1] = y
-    a[2] = radius
-    a[3] = radius
-    a[4] = radius
-    a[5] = radius
-    
-    #print('xyr',x,y,radius)
+    a[-numpoints:] = radius
     
     circle = (xx - x) ** 2 + (yy - y) ** 2
     R2 = (radius-w)**2
@@ -39,37 +35,38 @@ def plot_all( sample = None, model = None, labels = None, circle = False):
     plt.imshow(img, cmap=plt.cm.gray_r)
     with torch.no_grad():
         pred = model(sample.unsqueeze(0).cuda())
-        assert pred.shape == (1,6)
+        numpoints = pred.shape[1]-2
+        assert pred.shape == (1,numpoints+2)
         xpred = pred[0,0].unsqueeze(0)
         ypred = pred[0,1].unsqueeze(0)
         assert xpred.shape == (1,)
         assert ypred.shape == (1,)
-        rpred = pred[0,-4:]
-        assert rpred.shape == (4,)
+        rpred = pred[0,-numpoints:]
+        assert rpred.shape == (numpoints,)
         xrfactors = torch.zeros_like(rpred)
         yrfactors = torch.zeros_like(rpred)
-        xrfactors[0] = 0.0
-        xrfactors[1] = -1.0
-        xrfactors[2] = 0.0
-        xrfactors[3] = 1.0
-        yrfactors[0] = 1.0
-        yrfactors[1] = 0.0
-        yrfactors[2] = -1.0
-        yrfactors[3] = 0.0
+        
+        theta = torch.FloatTensor(range(numpoints))
+        theta*=1.0/numpoints
+        theta*=math.pi*2.0
+        
+        xrfactors[:] = torch.cos(theta)
+        yrfactors[:] = torch.sin(theta)
+        
         #print(xpred,xrfactors.shape,rpred.shape)
         #assert False
         xpreds = xpred+xrfactors*rpred
-        assert xpreds.shape == (4,)
+        assert xpreds.shape == (numpoints,)
         #assert False
         ypreds = ypred+yrfactors*rpred
-        assert ypreds.shape == (4,)
+        assert ypreds.shape == (numpoints,)
 
         #print (ypreds.shape)
         #assert False
         xpreds = xpreds.cpu().numpy()
-        assert xpreds.shape == (4,)
+        assert xpreds.shape == (numpoints,)
         ypreds = ypreds.cpu().numpy()
-        assert ypreds.shape == (4,)
+        assert ypreds.shape == (numpoints,)
         
         X = xpred.cpu().numpy()
         Y = ypred.cpu().numpy()
@@ -77,10 +74,13 @@ def plot_all( sample = None, model = None, labels = None, circle = False):
         X = np.concatenate((X,xpreds),axis = 0)
         Y = np.concatenate((Y,ypreds),axis = 0)
         print(X)
-        assert X.shape == (5,)
-        assert Y.shape == (5,)
+        assert X.shape == (numpoints+1,)
+        assert Y.shape == (numpoints+1,)
         # Plotting point using sactter method
-        ascatter = plt.scatter(Y,X,s = [.6,.6,.6,.6,.6],c = ['blue','red','red','red','red'])
+        s = [.6 for x in range(numpoints+1)]
+        c = ['red' for x in range(numpoints+1)]
+        c[0] = 'blue'
+        ascatter = plt.scatter(Y,X,s = s,c = c)
         plt.gca().add_artist(ascatter)
     """if circle:
         if model != None:
@@ -161,7 +161,7 @@ class DonutDataset(torch.utils.data.Dataset):
             plt.subplot(10,10,i+1)
             plot_all(sample = sample,model=model, labels = labels)
             plt.axis('off')
-        plt.savefig('finalplot.png')
+        plt.savefig('finalplot.png',dpi=300)
 
 #dataset = DonutDataset(length = 1024)
 #DonutDataset.displayDonuts(dataset, model = None)

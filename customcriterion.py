@@ -1,6 +1,6 @@
 import torch
 from torch.nn.modules.loss import _Loss
-
+import math
 
 class CustomCriterion(_Loss):
     def __init__(self, size_average=None, reduce=None, reduction='mean'):
@@ -8,8 +8,9 @@ class CustomCriterion(_Loss):
 
     def forward(self, input, target):
         batchsize = input.shape[0]
-        assert input.shape == (batchsize,6)
-        assert target.shape == (batchsize,6)
+        numpoints = input.shape[1]-2
+        assert input.shape == (batchsize,numpoints+2)
+        assert target.shape == (batchsize,numpoints+2)
         xgt = target[:,0]
         ygt = target[:,1]
         
@@ -19,22 +20,19 @@ class CustomCriterion(_Loss):
         loss_xy = (xgt-xpred)**2+(ygt-ypred)**2
         loss_xy = torch.sum(loss_xy)/(float)(batchsize)
 
-        rpred = input[:,-4:]
-        rgt = target[:,-4:]
-        assert rpred.shape == (batchsize,4)
-        assert rgt.shape == (batchsize,4)
+        rpred = input[:,-10:]
+        rgt = target[:,-numpoints:]
+        assert rpred.shape == (batchsize,numpoints)
+        assert rgt.shape == (batchsize,numpoints)
         
         xrfactors = torch.zeros_like(rpred)
         yrfactors = torch.zeros_like(rpred)
-        xrfactors[:,0] = 0.0
-        xrfactors[:,1] = -1.0
-        xrfactors[:,2] = 0.0
-        xrfactors[:,3] = 1.0
+        theta = torch.FloatTensor(range(numpoints))
+        theta*=1.0/numpoints
+        theta*=math.pi*2.0
         
-        yrfactors[:,0] = 1.0
-        yrfactors[:,1] = 0.0
-        yrfactors[:,2] = -1.0
-        yrfactors[:,3] = 0.0
+        xrfactors[:,:] = torch.cos(theta)
+        yrfactors[:,:] = torch.sin(theta)
         
         xpred = xpred.unsqueeze(1)
         ypred = ypred.unsqueeze(1)
@@ -44,14 +42,14 @@ class CustomCriterion(_Loss):
 
         xgt = xgt.unsqueeze(1)
         ygt = ygt.unsqueeze(1)
-        assert rgt.shape == (batchsize,4)
-        assert rpred.shape == (batchsize,4)
+        assert rgt.shape == (batchsize,numpoints)
+        assert rpred.shape == (batchsize,numpoints)
         assert xgt.shape == (batchsize,1)
         assert ygt.shape == (batchsize,1)
         xgt = xgt+xrfactors*rgt
         ygt = ygt+yrfactors*rgt
 
         loss_rpts = (xpred-xgt)**2+(ypred-ygt)**2
-        assert loss_rpts.shape == (batchsize,4)
-        loss_rpts = torch.sum(loss_rpts)/(batchsize*4.0)
+        assert loss_rpts.shape == (batchsize,numpoints)
+        loss_rpts = torch.sum(loss_rpts)/(batchsize*numpoints)
         return loss_xy+loss_rpts

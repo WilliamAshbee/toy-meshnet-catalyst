@@ -22,7 +22,7 @@ y_encoding = y_encoding.unsqueeze(0).unsqueeze(0)
 
 
 class VGG(nn.Module):
-    def __init__(self, features, num_classes=6):#predict a triangle
+    def __init__(self, features, num_classes=10+2):#predict x,y n rs
         super(VGG, self).__init__()
         self.results =  None
         self.features = features
