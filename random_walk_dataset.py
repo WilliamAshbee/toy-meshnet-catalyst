@@ -4,7 +4,7 @@ import pylab as plt
 from skimage import filters
 import math
 
-numpoints = 10
+numpoints = 100
 
 def random_matrix():
     side = 32
@@ -68,28 +68,30 @@ def random_matrix():
 def plot_all( sample = None, model = None, labels = None):
     img = sample[0,:,:].squeeze().cpu().numpy()
     plt.imshow(img, cmap=plt.cm.gray_r)
-    
-    x0 = labels[0]
-    y0 = labels[1]
-    rs = labels[-numpoints:]
-    
-    X = np.zeros((numpoints+1,))
-    Y = np.zeros((numpoints+1,))
-    
-    X[0] = x0
-    Y[0] = y0
-    ind = [x for x in range(numpoints)]
-    theta = torch.FloatTensor(ind)
-    theta *= math.pi*2.0/(float)(numpoints)
+    with torch.no_grad():
+        pred = model(sample.unsqueeze(0).cuda())
+        x0 = pred[0,0].cpu()
+        y0 = pred[0,1].cpu()
+        rs = pred[0,-numpoints:].cpu()
+        
+        X = torch.zeros((numpoints+1,))
+        Y = torch.zeros((numpoints+1,))
+        
+        X[0] = x0
+        Y[0] = y0
+        
+        ind = [x for x in range(numpoints)]
+        theta = torch.FloatTensor(ind)
+        theta *= math.pi*2.0/(float)(numpoints)
 
-    
-    X[-numpoints:] = x0+np.cos(theta)*labels[-numpoints:]
-    Y[-numpoints:] = y0+np.sin(theta)*labels[-numpoints:]
-    s = [.6 for x in range(numpoints+1)]
-    c = ['red' for x in range(numpoints+1)]
-    c[0] = 'blue'
-    ascatter = plt.scatter(Y,X,s = s,c = c)
-    plt.gca().add_artist(ascatter)
+        
+        X[-numpoints:] = x0+torch.cos(theta)*rs[-numpoints:]
+        Y[-numpoints:] = y0+torch.sin(theta)*rs[-numpoints:]
+        s = [.6 for x in range(numpoints+1)]
+        c = ['red' for x in range(numpoints+1)]
+        c[0] = 'blue'
+        ascatter = plt.scatter(Y.cpu().numpy(),X.cpu().numpy(),s = s,c = c)
+        plt.gca().add_artist(ascatter)
 
 
 class RandomDataset(torch.utils.data.Dataset):
@@ -131,5 +133,5 @@ class RandomDataset(torch.utils.data.Dataset):
             plt.axis('off')
         plt.savefig('finalplot.png',dpi=600)
 
-dataset = RandomDataset(length = 1024)
-RandomDataset.displayCanvas(dataset, model = None)
+#dataset = RandomDataset(length = 1024)
+#RandomDataset.displayCanvas(dataset, model = None)

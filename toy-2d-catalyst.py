@@ -8,6 +8,7 @@ from torchvision import transforms
 import argparse
 from CirclesLoad import CirclesLoad
 from DonutDataset import DonutDataset
+from random_walk_dataset import RandomDataset
 from customcriterion import CustomCriterion
 import torchvision.transforms.functional as F
 import os
@@ -37,8 +38,8 @@ args = parser.parse_args()
 
 #dataset_train = CirclesLoad(args.root,  img_tf, 'train',None)
 #dataset_val = CirclesLoad(args.root,  img_tf, 'val',None)
-dataset_train = DonutDataset(256*64)
-dataset_val = DonutDataset(256)
+dataset_train = RandomDataset(256*32)
+dataset_val = RandomDataset(256)
 
 
 loader_train = data.DataLoader(
@@ -73,10 +74,10 @@ runner.train(
     scheduler=scheduler,
     loaders=loaders,
     logdir=logdir,
-    num_epochs=20,
+    num_epochs=25,
     verbose=True,
     callbacks=[dl.BatchOverfitCallback(train=10, valid=10)]
 )
 
 
-DonutDataset.displayDonuts(dataset_val,model)
+RandomDataset.displayCanvas(dataset_val,model)
