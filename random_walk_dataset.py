@@ -4,39 +4,42 @@ import pylab as plt
 from skimage import filters
 import math
 
-numpoints = 1000
+numpoints = 10
 
 def random_matrix():
     side = 32
-    radiusMax = 15
+    radiusMax = 9
     w = 1
-    numpoints = 1000
     sigmas = [None, 1]
 
-    radius = np.random.randint(1,radiusMax)
     #sigma=sigmas[np.random.randint(len(sigmas))]
     
     canvas = np.zeros((side, side))
     
-    x0 = np.random.randint(radius+1, side - radius-1)
-    y0 = np.random.randint(radius+1, side - radius-1)
+    x0 = np.random.randint(radiusMax+1, side - radiusMax-1)
+    y0 = np.random.randint(radiusMax+1, side - radiusMax-1)
     
     a = torch.zeros((numpoints+2,))
     a[0] = x0
     a[1] = y0
     
     radii = np.zeros((numpoints))
+    radius = radiusMax-1
+
     for i in range(numpoints):
         if radius <= 2:
-            radii[i] = radius + np.random.choice([0,1],1)
+            radius = radius + np.random.choice([0,1],1)
+            radii[i] = radius
         elif radius >= radiusMax-1:
-            radii[i] = radius + np.random.choice([-1,0],1)
+            radius = radius + np.random.choice([-1,0],1)
+            radii[i] = radius
         else:
-            radii[i] = radius + np.random.choice([-1,0,1],1)
+            radius = radius + np.random.choice([-1,0,1],1)
+            radii[i] = radius
     
     ind = [x for x in range(numpoints)]
     theta = torch.FloatTensor(ind)
-    theta *= math.pi*2.0
+    theta *= math.pi*2.0/(float)(numpoints)
     
     xrfactors = torch.zeros(numpoints)
     yrfactors = torch.zeros(numpoints)
@@ -77,7 +80,8 @@ def plot_all( sample = None, model = None, labels = None):
     Y[0] = y0
     ind = [x for x in range(numpoints)]
     theta = torch.FloatTensor(ind)
-    theta *= math.pi*2.0
+    theta *= math.pi*2.0/(float)(numpoints)
+
     
     X[-numpoints:] = x0+np.cos(theta)*labels[-numpoints:]
     Y[-numpoints:] = y0+np.sin(theta)*labels[-numpoints:]
@@ -125,7 +129,7 @@ class RandomDataset(torch.utils.data.Dataset):
             plt.subplot(10,10,i+1)
             plot_all(sample = sample,model=model, labels = labels)
             plt.axis('off')
-        plt.savefig('finalplot.png',dpi=300)
+        plt.savefig('finalplot.png',dpi=600)
 
 dataset = RandomDataset(length = 1024)
 RandomDataset.displayCanvas(dataset, model = None)
