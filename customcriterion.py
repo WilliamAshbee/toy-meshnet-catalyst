@@ -7,5 +7,5 @@ class CustomCriterion(_Loss):
         super(CustomCriterion, self).__init__(size_average, reduce, reduction)
 
     def forward(self, input, target):
-        loss = torch.mean((input-target)**2)
+        loss = torch.mean((input-target)**4)
         return loss

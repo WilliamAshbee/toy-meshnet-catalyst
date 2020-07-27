@@ -8,7 +8,7 @@ numpoints = 100
 
 def random_matrix():
     side = 32
-    radiusMax = 9
+    radiusMax = 14
     w = 1
     sigmas = [None, 1]
 
@@ -16,15 +16,15 @@ def random_matrix():
     
     canvas = np.zeros((side, side))
     
-    x0 = np.random.randint(radiusMax+1, side - radiusMax-1)
-    y0 = np.random.randint(radiusMax+1, side - radiusMax-1)
+    x0 = 16#np.random.randint(radiusMax+1, side - radiusMax-1)
+    y0 = 16#np.random.randint(radiusMax+1, side - radiusMax-1)
     
     a = torch.zeros((numpoints+2,))
     a[0] = x0
     a[1] = y0
     
     radii = np.zeros((numpoints))
-    radius = radiusMax-1
+    radius = np.random.randint(2, radiusMax-1)
 
     for i in range(numpoints):
         if radius <= 2:
@@ -43,7 +43,7 @@ def random_matrix():
     
     xrfactors = torch.zeros(numpoints)
     yrfactors = torch.zeros(numpoints)
-        
+    
     xrfactors[:] = torch.cos(theta)
     yrfactors[:] = torch.sin(theta)
 

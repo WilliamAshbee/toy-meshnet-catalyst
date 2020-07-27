@@ -5,7 +5,7 @@ from skimage import filters
 import math
 def circle_matrix():
     side = 32
-    radiusMax=15
+    radiusMax = 15
     w = 1
     numpoints = 1000
     radius = np.random.randint(1,radiusMax)
@@ -18,8 +18,16 @@ def circle_matrix():
     a = torch.zeros((numpoints+2,))
     a[0] = x
     a[1] = y
-    a[-numpoints:] = radius
+    ind = [x for x in range(2,2*numpoints+2,2)]
+    a[ind] = radius
+    ind = [x for x in range(3,2*numpoints+2,2)]
     
+    theta = torch.FloatTensor(range(numpoints))
+    theta*=1.0/numpoints
+    theta*=math.pi*2.0
+    
+    a[ind] = theta
+
     circle = (xx - x) ** 2 + (yy - y) ** 2
     R2 = (radius-w)**2
     R1 = (radius+w)**2
@@ -46,9 +54,6 @@ def plot_all( sample = None, model = None, labels = None, circle = False):
         xrfactors = torch.zeros_like(rpred)
         yrfactors = torch.zeros_like(rpred)
         
-        theta = torch.FloatTensor(range(numpoints))
-        theta*=1.0/numpoints
-        theta*=math.pi*2.0
         
         xrfactors[:] = torch.cos(theta)
         yrfactors[:] = torch.sin(theta)
