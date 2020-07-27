@@ -15,17 +15,17 @@ def random_matrix():
     #sigma=sigmas[np.random.randint(len(sigmas))]
     
     canvas = np.zeros((side, side))
+    radius = np.random.randint(2, radiusMax-2)
     
-    x0 = 16#np.random.randint(radiusMax+1, side - radiusMax-1)
-    y0 = 16#np.random.randint(radiusMax+1, side - radiusMax-1)
+    x0 = np.random.randint(1+radiusMax, side - radiusMax)
+    y0 = np.random.randint(1+radiusMax, side - radiusMax)
     
     a = torch.zeros((numpoints+2,))
     a[0] = x0
     a[1] = y0
     
     radii = np.zeros((numpoints))
-    radius = np.random.randint(2, radiusMax-1)
-
+    
     for i in range(numpoints):
         if radius <= 2:
             radius = radius + np.random.choice([0,1],1)
@@ -46,15 +46,21 @@ def random_matrix():
     
     xrfactors[:] = torch.cos(theta)
     yrfactors[:] = torch.sin(theta)
-
-    for i in ind:
-        x = (int)(x0+xrfactors[i]*radii[i])
-        y = (int)(y0+yrfactors[i]*radii[i])
-        assert x >= 0
-        assert x <= 31
-        assert y >= 0
-        assert y <= 31
-        canvas[x,y] = 1.0
+    x = (x0+xrfactors*radii).type(torch.LongTensor)
+    y = (y0+yrfactors*radii).type(torch.LongTensor)
+    assert torch.sum(x[x>31])==0 
+    assert torch.sum(x[x<0])==0 
+    assert torch.sum(y[y>31])==0 
+    assert torch.sum(y[y<0])==0 
+    canvas[x,y]=1.0
+    #    for i in ind:
+    #        x = (int)(x0+xrfactors[i]*radii[i])
+    #        y = (int)(y0+yrfactors[i]*radii[i])
+    #        assert x >= 0
+    #        assert x <= 31
+    #        assert y >= 0
+    #        assert y <= 31
+    #        canvas[x,y] = 1.0
         
 
     a[-numpoints:] = torch.from_numpy(radii)
