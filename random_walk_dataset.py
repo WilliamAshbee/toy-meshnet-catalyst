@@ -17,12 +17,9 @@ def random_matrix():
     canvas = np.zeros((side, side))
     radius = np.random.randint(2, radiusMax-2)
     
-    x0 = np.random.randint(1+radiusMax, side - radiusMax)
-    y0 = np.random.randint(1+radiusMax, side - radiusMax)
+    x0 = 16#np.random.randint(1+radiusMax, side - radiusMax)
+    y0 = 16#np.random.randint(1+radiusMax, side - radiusMax)
     
-    a = torch.zeros((numpoints+2,))
-    a[0] = x0
-    a[1] = y0
     
     radii = np.zeros((numpoints))
     
@@ -63,42 +60,55 @@ def random_matrix():
     #        canvas[x,y] = 1.0
         
 
-    a[-numpoints:] = torch.from_numpy(radii)
     
     #if sigma is not None:
     #    donut = filters.gaussian(donut, sigma=(sigma, sigma))
-    
-    return {'canvas': canvas, 'x': x0, 'y': y0, 'radius':radius, 'points':a}
+    points = torch.zeros(x.shape[0],2)
+    points[:,0] = x
+    points[:,1] = y
+    return {
+        'canvas': canvas, 
+        'x': x0, 
+        'y': y0,
+        'points':points.type(torch.FloatTensor)}
 
 
 def plot_all( sample = None, model = None, labels = None):
     img = sample[0,:,:].squeeze().cpu().numpy()
     plt.imshow(img, cmap=plt.cm.gray_r)
-    with torch.no_grad():
-        pred = model(sample.unsqueeze(0).cuda())
-        x0 = pred[0,0].cpu()
-        y0 = pred[0,1].cpu()
-        rs = pred[0,-numpoints:].cpu()
-        
-        X = torch.zeros((numpoints+1,))
-        Y = torch.zeros((numpoints+1,))
-        
-        X[0] = x0
-        Y[0] = y0
-        
-        ind = [x for x in range(numpoints)]
-        theta = torch.FloatTensor(ind)
-        theta *= math.pi*2.0/(float)(numpoints)
+    if model != None:
+        with torch.no_grad():
+            pred = model(sample.unsqueeze(0).cuda())
+            x0 = pred[0,0].cpu()
+            y0 = pred[0,1].cpu()
+            rs = pred[0,-numpoints:].cpu()
+            
+            X = torch.zeros((numpoints+1,))
+            Y = torch.zeros((numpoints+1,))
+            
+            X[0] = x0
+            Y[0] = y0
+            
+            ind = [x for x in range(numpoints)]
+            theta = torch.FloatTensor(ind)
+            theta *= math.pi*2.0/(float)(numpoints)
 
+            
+            X[-numpoints:] = x0+torch.cos(theta)*rs[-numpoints:]
+            Y[-numpoints:] = y0+torch.sin(theta)*rs[-numpoints:]
+            s = [.6 for x in range(numpoints+1)]
+            c = ['red' for x in range(numpoints+1)]
+            c[0] = 'blue'
+            ascatter = plt.scatter(Y.cpu().numpy(),X.cpu().numpy(),s = s,c = c)
+            plt.gca().add_artist(ascatter)
+    else:
         
-        X[-numpoints:] = x0+torch.cos(theta)*rs[-numpoints:]
-        Y[-numpoints:] = y0+torch.sin(theta)*rs[-numpoints:]
-        s = [.6 for x in range(numpoints+1)]
-        c = ['red' for x in range(numpoints+1)]
-        c[0] = 'blue'
+        X = labels[:,0]
+        Y = labels[:,1]
+        s = [.1 for x in range(numpoints)]
+        c = ['red' for x in range(numpoints)]
         ascatter = plt.scatter(Y.cpu().numpy(),X.cpu().numpy(),s = s,c = c)
         plt.gca().add_artist(ascatter)
-
 
 class RandomDataset(torch.utils.data.Dataset):
     """Donut dataset."""
@@ -119,7 +129,7 @@ class RandomDataset(torch.utils.data.Dataset):
 
     def __getitem__(self, idx):
         map = random_matrix()
-        out = map['points']
+        points = map['points']
         result = map['canvas']
         assert result.shape == (32,32)
         result = np.reshape(result,(1,32,32))
@@ -128,7 +138,7 @@ class RandomDataset(torch.utils.data.Dataset):
         result = torch.from_numpy(result)
         result = result.repeat(3, 1, 1).float()
         assert result.shape == (3,32,32)
-        return result, torch.FloatTensor(out)
+        return result, points
     
     @staticmethod
     def displayCanvas(dataset, model):
