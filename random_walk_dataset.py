@@ -63,25 +63,14 @@ def plot_all( sample = None, model = None, labels = None):
     if model != None:
         with torch.no_grad():
             pred = model(sample.unsqueeze(0).cuda())
-            x0 = pred[0,0].cpu()
-            y0 = pred[0,1].cpu()
-            rs = pred[0,-numpoints:].cpu()
-            
-            X = torch.zeros((numpoints+1,))
-            Y = torch.zeros((numpoints+1,))
-            
-            X[0] = x0
-            Y[0] = y0
-            
-            ind = [x for x in range(numpoints)]
-            theta = torch.FloatTensor(ind)
-            theta *= math.pi*2.0/(float)(numpoints)
-
-            X[-numpoints:] = x0+(torch.cos(theta)*rs[-numpoints:])
-            Y[-numpoints:] = y0+(torch.sin(theta)*rs[-numpoints:])
-            s = [.6 for x in range(numpoints+1)]
-            c = ['red' for x in range(numpoints+1)]
-            c[0] = 'blue'
+            numpoints = 100
+            X = pred[0,:numpoints]
+            Y = pred[0,-numpoints:]
+            print (X.shape,Y.shape)
+            s = [.1 for x in range(numpoints)]
+            assert len(s) == numpoints
+            c = ['red' for x in range(numpoints)]
+            assert len(c) == numpoints
             ascatter = plt.scatter(Y.cpu().numpy(),X.cpu().numpy(),s = s,c = c)
             plt.gca().add_artist(ascatter)
     else:
