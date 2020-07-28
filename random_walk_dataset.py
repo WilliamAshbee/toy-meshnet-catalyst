@@ -43,32 +43,19 @@ def random_matrix():
     
     xrfactors[:] = torch.cos(theta)
     yrfactors[:] = torch.sin(theta)
-    x = (x0+xrfactors*radii).type(torch.LongTensor)
-    y = (y0+yrfactors*radii).type(torch.LongTensor)
+    x = (x0+(xrfactors*radii)).type(torch.LongTensor)
+    y = (y0+(yrfactors*radii)).type(torch.LongTensor)
     assert torch.sum(x[x>31])==0 
     assert torch.sum(x[x<0])==0 
     assert torch.sum(y[y>31])==0 
     assert torch.sum(y[y<0])==0 
     canvas[x,y]=1.0
-    #    for i in ind:
-    #        x = (int)(x0+xrfactors[i]*radii[i])
-    #        y = (int)(y0+yrfactors[i]*radii[i])
-    #        assert x >= 0
-    #        assert x <= 31
-    #        assert y >= 0
-    #        assert y <= 31
-    #        canvas[x,y] = 1.0
-        
-
-    
-    #if sigma is not None:
-    #    donut = filters.gaussian(donut, sigma=(sigma, sigma))
     points = torch.zeros(x.shape[0],2)
     points[:,0] = x
     points[:,1] = y
     return {
         'canvas': canvas, 
-        'x': x0, 
+        'x': x0,
         'y': y0,
         'points':points.type(torch.FloatTensor)}
 
@@ -93,16 +80,14 @@ def plot_all( sample = None, model = None, labels = None):
             theta = torch.FloatTensor(ind)
             theta *= math.pi*2.0/(float)(numpoints)
 
-            
-            X[-numpoints:] = x0+torch.cos(theta)*rs[-numpoints:]
-            Y[-numpoints:] = y0+torch.sin(theta)*rs[-numpoints:]
+            X[-numpoints:] = x0+(torch.cos(theta)*rs[-numpoints:])
+            Y[-numpoints:] = y0+(torch.sin(theta)*rs[-numpoints:])
             s = [.6 for x in range(numpoints+1)]
             c = ['red' for x in range(numpoints+1)]
             c[0] = 'blue'
             ascatter = plt.scatter(Y.cpu().numpy(),X.cpu().numpy(),s = s,c = c)
             plt.gca().add_artist(ascatter)
     else:
-        
         X = labels[:,0]
         Y = labels[:,1]
         s = [.1 for x in range(numpoints)]

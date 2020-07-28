@@ -20,25 +20,11 @@ mini_batch = 200
 size = (32, 32)
 parser = argparse.ArgumentParser()
 
-img_tf = transforms.Compose(
-    [
-        transforms.Resize(size=size),
-        transforms.ToTensor(),
-        transforms.Lambda(lambda x: 1.0*(x<torch.mean(x)))
-    ]
-)
-topil_tf = transforms.Compose(
-    [
-        transforms.ToPILImage()
-    ]
-)
 
 parser.add_argument('--root', type=str, default='/data/mialab/users/washbee/circles-simple/')
 args = parser.parse_args()
 
-#dataset_train = CirclesLoad(args.root,  img_tf, 'train',None)
-#dataset_val = CirclesLoad(args.root,  img_tf, 'val',None)
-dataset_train = RandomDataset(256*32)
+dataset_train = RandomDataset(40000)
 dataset_val = RandomDataset(256)
 
 
@@ -48,7 +34,7 @@ loader_train = data.DataLoader(
     num_workers=4)
 
 loader_val = data.DataLoader(
-    dataset_train, batch_size=mini_batch,
+    dataset_val, batch_size=mini_batch,
     sampler=RandomSampler(data_source = dataset_val),
     num_workers=4)
 
@@ -74,7 +60,7 @@ runner.train(
     scheduler=scheduler,
     loaders=loaders,
     logdir=logdir,
-    num_epochs=50,
+    num_epochs=70,
     verbose=True,
     callbacks=[dl.BatchOverfitCallback(train=10, valid=10)]
 )
