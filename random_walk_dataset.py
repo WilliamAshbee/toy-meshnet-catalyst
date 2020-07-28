@@ -8,18 +8,15 @@ numpoints = 100
 
 def random_matrix():
     side = 32
-    radiusMax = 14
+    radiusMax = 12
     w = 1
     sigmas = [None, 1]
 
-    #sigma=sigmas[np.random.randint(len(sigmas))]
-    
     canvas = np.zeros((side, side))
-    radius = np.random.randint(2, radiusMax-2)
+    radius = np.random.randint(2, radiusMax)
     
-    x0 = 16#np.random.randint(1+radiusMax, side - radiusMax)
-    y0 = 16#np.random.randint(1+radiusMax, side - radiusMax)
-    
+    x0 = np.random.randint(1+radiusMax, side - radiusMax-1)
+    y0 = np.random.randint(1+radiusMax, side - radiusMax-1)
     
     radii = np.zeros((numpoints))
     
