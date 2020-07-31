@@ -74,8 +74,9 @@ def plot_all( sample = None, model = None, labels = None):
             ascatter = plt.scatter(Y.cpu().numpy(),X.cpu().numpy(),s = s,c = c)
             plt.gca().add_artist(ascatter)
     else:
-        X = labels[:,0]
-        Y = labels[:,1]
+        numpoints = 100
+        X = labels[:numpoints,0]
+        Y = labels[:numpoints,1]
         s = [.1 for x in range(numpoints)]
         c = ['red' for x in range(numpoints)]
         ascatter = plt.scatter(Y.cpu().numpy(),X.cpu().numpy(),s = s,c = c)
@@ -120,5 +121,5 @@ class RandomDataset(torch.utils.data.Dataset):
             plt.axis('off')
         plt.savefig('finalplot.png',dpi=600)
 
-#dataset = RandomDataset(length = 1024)
-#RandomDataset.displayCanvas(dataset, model = None)
+dataset = RandomDataset(length = 1024)
+RandomDataset.displayCanvas(dataset, model = None)
