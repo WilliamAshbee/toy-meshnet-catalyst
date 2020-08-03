@@ -20,10 +20,11 @@ def random_matrix(length = 10):
     radii = np.zeros((length,numpoints))    
     radii[:, 0] = r0
     for i in range(1,numpoints):
-        radii[:, i] = radii[:, i-1] + np.random.choice([-1,0,1],1)
-        radii[radii[:,i-1]<= 2, i] = radii[radii[:,i-1]<= 2, i-1] + np.random.choice([0,1],1)
-        radii[radii[:,i-1]>= radiusMax-1, i] = radii[radii[:,i-1]>= radiusMax-1, i-1] + np.random.choice([-1,0],1)
-        
+        #print(radii[:, i-1].shape)
+        radii[:, i] = radii[:, i-1] + np.random.choice([-1,0,1],(length))
+        radii[radii[:,i-1]<= 2, i] = radii[radii[:,i-1]<= 2, i-1] + np.random.choice([0,1],np.sum(radii[:,i-1]<= 2))
+        radii[radii[:,i-1]>= radiusMax-1, i] = radii[radii[:,i-1]>= radiusMax-1, i-1] + np.random.choice([-1,0],np.sum(radii[:,i-1] >= radiusMax-1))
+    #print(radii)
     ind = [x for x in range(numpoints)]
     theta = torch.FloatTensor(ind)
     theta *= math.pi*2.0/(float)(numpoints)
@@ -65,7 +66,7 @@ def plot_all( sample = None, model = None, labels = None):
             numpoints = 100
             X = pred[0,:numpoints]
             Y = pred[0,-numpoints:]
-            print (X.shape,Y.shape)
+            #print (X.shape,Y.shape)
             s = [.1 for x in range(numpoints)]
             assert len(s) == numpoints
             c = ['red' for x in range(numpoints)]
@@ -73,7 +74,7 @@ def plot_all( sample = None, model = None, labels = None):
             ascatter = plt.scatter(Y.cpu().numpy(),X.cpu().numpy(),s = s,c = c)
             plt.gca().add_artist(ascatter)
     else:
-        print(labels.shape)
+        #print(labels.shape)
         numpoints = 100
         X = labels[:numpoints,0]
         Y = labels[:numpoints,1]
@@ -103,7 +104,6 @@ class RandomDataset(torch.utils.data.Dataset):
 
     def __getitem__(self, idx):
         canvas = self.values["canvas"]
-        print(type(canvas))
         
         canvas = canvas[idx,:,:]
         assert canvas.shape == (32,32)
@@ -130,5 +130,5 @@ class RandomDataset(torch.utils.data.Dataset):
             plt.axis('off')
         plt.savefig('finalplot.png',dpi=600)
 
-#dataset = RandomDataset(length = 1024)
-#RandomDataset.displayCanvas(dataset, model = None)
+dataset = RandomDataset(length = 100)
+RandomDataset.displayCanvas(dataset, model = None)
