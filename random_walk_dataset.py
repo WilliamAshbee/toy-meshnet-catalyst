@@ -13,9 +13,9 @@ def random_matrix(length = 10):
     sigmas = [None, 1]
 
     canvas = torch.zeros((length,side, side))
-    x0 = np.array([np.random.randint(1+radiusMax, side - radiusMax-1) for x in range(length)])
-    y0 = np.array([np.random.randint(1+radiusMax, side - radiusMax-1) for x in range(length)])
-    r0 = np.array([np.random.randint(2, radiusMax) for x in range(length)])
+    x0 = np.random.randint(1+radiusMax, side - radiusMax-1,length)
+    y0 = np.random.randint(1+radiusMax, side - radiusMax-1,length)
+    r0 = np.random.randint(2, radiusMax, length) 
 
     radii = np.zeros((length,numpoints))    
     radii[:, 0] = r0
