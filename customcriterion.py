@@ -15,6 +15,6 @@ class CustomCriterion(_Loss):
         
         assert xpred.shape == xgt.shape 
         assert ypred.shape == ygt.shape
-
+        
         loss = torch.mean((xpred-xgt)**2+(ypred-ygt)**2)
         return loss

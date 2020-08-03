@@ -130,5 +130,5 @@ class RandomDataset(torch.utils.data.Dataset):
             plt.axis('off')
         plt.savefig('finalplot.png',dpi=600)
 
-dataset = RandomDataset(length = 100)
-RandomDataset.displayCanvas(dataset, model = None)
+#dataset = RandomDataset(length = 100)
+#RandomDataset.displayCanvas(dataset, model = None)

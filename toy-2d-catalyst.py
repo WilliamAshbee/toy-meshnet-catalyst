@@ -45,8 +45,8 @@ print('model')
 # model, criterion, optimizer, scheduler
 model = vgg13().cuda()
 criterion = CustomCriterion().cuda()
-optimizer = torch.optim.Adam(model.parameters(),lr=0.001)
-scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer,milestones =  [6, 12,18,24,30,40,50,60,70,80,90], gamma = .5)
+optimizer = torch.optim.Adam(model.parameters(),lr=0.001, weight_decay = .01)
+scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer,milestones =  [6, 12,18,24,30,40,50,60,70,80,90], gamma = .25)
 
 print('training')
 
@@ -60,10 +60,9 @@ runner.train(
     scheduler=scheduler,
     loaders=loaders,
     logdir=logdir,
-    num_epochs=25,
+    num_epochs=30,
     verbose=True,
     callbacks=[dl.BatchOverfitCallback(train=10, valid=10)]
 )
-
 
 RandomDataset.displayCanvas(dataset_val,model)
