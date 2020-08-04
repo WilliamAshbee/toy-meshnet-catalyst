@@ -12,6 +12,7 @@ from random_walk_dataset import RandomDataset
 from customcriterion import CustomCriterion
 import torchvision.transforms.functional as F
 import os
+from resnet import resnet18
 os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"   # see issue #152
 os.environ["CUDA_VISIBLE_DEVICES"]="0"
 
@@ -43,7 +44,8 @@ loaders = {"train": loader_train, "valid": loader_val}
 print('model')
 
 # model, criterion, optimizer, scheduler
-model = vgg13().cuda()
+#model = vgg13().cuda()
+model = resnet18(pretrained=False, progress=True).cuda()
 criterion = CustomCriterion().cuda()
 optimizer = torch.optim.Adam(model.parameters(),lr=0.001, weight_decay = .01)
 scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer,milestones =  [6, 12,18,24,30,40,50,60,70,80,90], gamma = .25)
