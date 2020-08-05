@@ -18,7 +18,7 @@ os.environ["CUDA_VISIBLE_DEVICES"]="0"
 
 print('data')
 mini_batch = 200
-size = (32, 32)
+#size = (32, 32)
 parser = argparse.ArgumentParser()
 
 
@@ -47,7 +47,7 @@ print('model')
 #model = vgg13().cuda()
 model = resnet18(pretrained=False, progress=True).cuda()
 criterion = CustomCriterion().cuda()
-optimizer = torch.optim.Adam(model.parameters(),lr=0.001, weight_decay = .01)
+optimizer = torch.optim.Adam(model.parameters(),lr=0.001, weight_decay = 0.0)
 scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer,milestones =  [6, 12,18,24,30,40,50,60,70,80,90], gamma = .25)
 
 print('training')
@@ -62,7 +62,7 @@ runner.train(
     scheduler=scheduler,
     loaders=loaders,
     logdir=logdir,
-    num_epochs=30,
+    num_epochs=20,
     verbose=True,
     callbacks=[dl.BatchOverfitCallback(train=10, valid=10)]
 )

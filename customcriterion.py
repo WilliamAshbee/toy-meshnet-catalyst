@@ -7,8 +7,8 @@ class CustomCriterion(_Loss):
         super(CustomCriterion, self).__init__(size_average, reduce, reduction)
         self.i = 0
     def forward(self, input, target):
-        xpred = input[:,:100]
-        ypred = input[:,-100:]
+        xpred = input[:,:1000]
+        ypred = input[:,-1000:]
         
         xgt = target[:,:,0]
         ygt = target[:,:,1]

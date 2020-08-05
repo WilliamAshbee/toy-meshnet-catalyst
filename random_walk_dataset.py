@@ -4,26 +4,28 @@ import pylab as plt
 from skimage import filters
 import math
 
-numpoints = 100
+global numpoints
+numpoints = 1000
+modn = 10
+side = 16
 
 def random_matrix(length = 10):
-    side = 32
-    radiusMax = 12
+    radiusMax = side /3
     w = 1
     sigmas = [None, 1]
 
     canvas = torch.zeros((length,side, side))
-    x0 = np.random.randint(1+radiusMax, side - radiusMax-1,length)
-    y0 = np.random.randint(1+radiusMax, side - radiusMax-1,length)
-    r0 = np.random.randint(2, radiusMax, length) 
+    x0 = np.random.uniform(1+radiusMax, side - radiusMax-1,length)
+    y0 = np.random.uniform(1+radiusMax, side - radiusMax-1,length)
+    r0 = np.random.uniform(2, radiusMax, length)
 
     radii = np.zeros((length,numpoints))    
     radii[:, 0] = r0
     for i in range(1,numpoints):
         #print(radii[:, i-1].shape)
-        radii[:, i] = radii[:, i-1] + np.random.choice([-1,0,1],(length))
-        radii[radii[:,i-1]<= 2, i] = radii[radii[:,i-1]<= 2, i-1] + np.random.choice([0,1],np.sum(radii[:,i-1]<= 2))
-        radii[radii[:,i-1]>= radiusMax-1, i] = radii[radii[:,i-1]>= radiusMax-1, i-1] + np.random.choice([-1,0],np.sum(radii[:,i-1] >= radiusMax-1))
+        radii[:, i] = radii[:, i-1] + np.random.uniform(-1.0,1.0,(length))
+        radii[radii[:,i-1]<= 2, i] = radii[radii[:,i-1]<= 2.0, i-1] + np.random.uniform(0.0,1.0,np.sum(radii[:,i-1]<= 2.0))
+        radii[radii[:,i-1]>= radiusMax-1, i] = radii[radii[:,i-1]>= radiusMax-1, i-1] + np.random.uniform(-1.0,0.0,np.sum(radii[:,i-1] >= radiusMax-1))
     #print(radii)
     ind = [x for x in range(numpoints)]
     theta = torch.FloatTensor(ind)
@@ -37,18 +39,19 @@ def random_matrix(length = 10):
     
     print(x0.shape,y0.shape,radii.shape,xrfactors.shape,yrfactors.shape)
 
-    x = (x0+(xrfactors*radii)).type(torch.LongTensor)
-    y = (y0+(yrfactors*radii)).type(torch.LongTensor)
+    x = (x0+(xrfactors*radii))
+    y = (y0+(yrfactors*radii))
     assert x.shape == (length,numpoints)
     assert y.shape == (length,numpoints)
-    assert torch.sum(x[x>31])==0 
+    assert torch.sum(x[x>(side-1)])==0 
     assert torch.sum(x[x<0])==0 
-    assert torch.sum(y[y>31])==0 
+    assert torch.sum(y[y>(side-1)])==0 
     assert torch.sum(y[y<0])==0 
     
     points = torch.zeros(length,numpoints,2)
     for l in range(length):
-        canvas[l,x[l,:],y[l,:]]=1.0
+        
+        canvas[l,x[l,:].type(torch.LongTensor),y[l,:].type(torch.LongTensor)]=1.0
         points[l,:,0] = x[l,:]
         points[l,:,1] = y[l,:]
     
@@ -62,8 +65,9 @@ def plot_all( sample = None, model = None, labels = None):
     plt.imshow(img, cmap=plt.cm.gray_r)
     if model != None:
         with torch.no_grad():
+            global numpoints
+
             pred = model(sample.unsqueeze(0).cuda())
-            numpoints = 100
             X = pred[0,:numpoints]
             Y = pred[0,-numpoints:]
             #print (X.shape,Y.shape)
@@ -75,10 +79,10 @@ def plot_all( sample = None, model = None, labels = None):
             plt.gca().add_artist(ascatter)
     else:
         #print(labels.shape)
-        numpoints = 100
+
         X = labels[:numpoints,0]
         Y = labels[:numpoints,1]
-        s = [.01 for x in range(numpoints)]
+        s = [.001 for x in range(numpoints)]
         c = ['red' for x in range(numpoints)]
         ascatter = plt.scatter(Y.cpu().numpy(),X.cpu().numpy(),s = s,c = c)
         plt.gca().add_artist(ascatter)
@@ -106,18 +110,18 @@ class RandomDataset(torch.utils.data.Dataset):
         canvas = self.values["canvas"]
         
         canvas = canvas[idx,:,:]
-        assert canvas.shape == (32,32)
-        canvas = torch.reshape(canvas,(1,32,32))
-        assert canvas.shape == (1,32,32)
+        assert canvas.shape == (side,side)
+        canvas = torch.reshape(canvas,(1,side,side))
+        assert canvas.shape == (1,side,side)
         
         #canvas = torch.from_numpy(canvas)
         canvas = canvas.repeat(3, 1, 1).float()
-        assert canvas.shape == (3,32,32)
+        assert canvas.shape == (3,side,side)
 
         points = self.values["points"]
         points = points[idx,:,:]
         #points = torch.from_numpy(points)
-        assert points.shape == (100,2)
+        assert points.shape == (numpoints,2)
         
         return canvas, points
     
@@ -130,5 +134,5 @@ class RandomDataset(torch.utils.data.Dataset):
             plt.axis('off')
         plt.savefig('finalplot.png',dpi=600)
 
-#dataset = RandomDataset(length = 100)
-#RandomDataset.displayCanvas(dataset, model = None)
+dataset = RandomDataset(length = 100)
+RandomDataset.displayCanvas(dataset, model = None)
