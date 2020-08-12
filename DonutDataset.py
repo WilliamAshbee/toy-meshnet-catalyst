@@ -7,7 +7,7 @@ import math
 global numpoints
 numpoints = 1000
 modn = 10
-side = 16
+side = 32
 
 def donut_matrix(length = 10):
     radiusMax = side /3
@@ -27,13 +27,13 @@ def donut_matrix(length = 10):
     
     for i in range(1,length):
         a = torch.sin(np.random.uniform(20.0)*theta+np.random.uniform(1000.0))
-        #print(a.shape,torch.max(a))
+        print(a.shape,torch.max(a))
         radii[i,:] += a
-        #print(radii.shape, torch.max(radii))
+        print(radii.shape, torch.max(radii))
     
 
     print(radii.max(axis = 0)[0].shape)
-    rmaxs = radii.max(axis = 0)[0]
+    rmaxs = radii.max(axis = 1)[0]
     pmins = rmaxs+1.0
     pmaxs = side-rmaxs-1.0
     x0 = np.random.uniform(pmins,pmaxs)
@@ -42,8 +42,8 @@ def donut_matrix(length = 10):
     x0 = torch.tensor(x0)
     y0 = torch.tensor(y0)
     
-    x0 = x0.unsqueeze(0)
-    y0 = y0.unsqueeze(0)
+    x0 = x0.unsqueeze(1)
+    y0 = y0.unsqueeze(1)
     #radii = torch.from_numpy(radii)
     xrfactors = torch.cos(theta).unsqueeze(0)
     yrfactors = torch.sin(theta).unsqueeze(0)
