@@ -6,7 +6,6 @@ import math
 
 global numpoints
 numpoints = 1000
-modn = 10
 side = 32
 
 def donut_matrix(length = 10):
@@ -15,7 +14,7 @@ def donut_matrix(length = 10):
     sigmas = [None, 1]
     
     canvas = torch.zeros((length,side, side))
-    r0 = torch.tensor(np.random.uniform(2, radiusMax, length))
+    r0 = torch.tensor(np.random.uniform(3.1, radiusMax, length))
 
     radii = torch.zeros((length,numpoints))
     radii[:, :] = r0.unsqueeze(1)
@@ -26,13 +25,13 @@ def donut_matrix(length = 10):
     theta *= math.pi*2.0/(float)(numpoints)
     
     for i in range(1,length):
-        a = torch.sin(np.random.uniform(20.0)*theta+np.random.uniform(1000.0))
-        print(a.shape,torch.max(a))
+        a = np.random.uniform(1.0,3.0)*torch.sin(np.random.uniform(20.0)*theta+np.random.uniform(1000.0))
+        #print(a.shape,torch.max(a))
         radii[i,:] += a
-        print(radii.shape, torch.max(radii))
+        #print(radii.shape, torch.max(radii))
     
 
-    print(radii.max(axis = 0)[0].shape)
+    #print(radii.max(axis = 0)[0].shape)
     rmaxs = radii.max(axis = 1)[0]
     pmins = rmaxs+1.0
     pmaxs = side-rmaxs-1.0
@@ -61,7 +60,6 @@ def donut_matrix(length = 10):
     
     points = torch.zeros(length,numpoints,2)
     for l in range(length):
-        
         canvas[l,x[l,:].type(torch.LongTensor),y[l,:].type(torch.LongTensor)]=1.0
         points[l,:,0] = x[l,:]
         points[l,:,1] = y[l,:]
@@ -145,5 +143,5 @@ class DonutDataset(torch.utils.data.Dataset):
             plt.axis('off')
         plt.savefig('finalplot.png',dpi=600)
 
-dataset = DonutDataset(length = 100)
-DonutDataset.displayCanvas(dataset, model = None)
+#dataset = DonutDataset(length = 100)
+#DonutDataset.displayCanvas(dataset, model = None)

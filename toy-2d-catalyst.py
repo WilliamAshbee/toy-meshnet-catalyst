@@ -25,8 +25,8 @@ parser = argparse.ArgumentParser()
 parser.add_argument('--root', type=str, default='/data/mialab/users/washbee/circles-simple/')
 args = parser.parse_args()
 
-dataset_train = RandomDataset(40000)
-dataset_val = RandomDataset(256)
+dataset_train = DonutDataset(40000)
+dataset_val = DonutDataset(256)
 
 
 loader_train = data.DataLoader(
@@ -62,7 +62,7 @@ runner.train(
     scheduler=scheduler,
     loaders=loaders,
     logdir=logdir,
-    num_epochs=20,
+    num_epochs=10,
     verbose=True,
     callbacks=[dl.BatchOverfitCallback(train=10, valid=10)]
 )
