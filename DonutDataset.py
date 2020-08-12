@@ -15,8 +15,6 @@ def donut_matrix(length = 10):
     sigmas = [None, 1]
     
     canvas = torch.zeros((length,side, side))
-    x0 = torch.tensor(np.random.uniform(1+radiusMax, side - radiusMax-1,length))
-    y0 = torch.tensor(np.random.uniform(1+radiusMax, side - radiusMax-1,length))
     r0 = torch.tensor(np.random.uniform(2, radiusMax, length))
 
     radii = torch.zeros((length,numpoints))
@@ -28,11 +26,24 @@ def donut_matrix(length = 10):
     theta *= math.pi*2.0/(float)(numpoints)
     
     for i in range(1,length):
-       radii[i,:] *= torch.sin(np.random.uniform(1.0,20.0)*theta+np.random.uniform(1000.0))
+        a = torch.sin(np.random.uniform(20.0)*theta+np.random.uniform(1000.0))
+        #print(a.shape,torch.max(a))
+        radii[i,:] += a
+        #print(radii.shape, torch.max(radii))
     
+
+    print(radii.max(axis = 0)[0].shape)
+    rmaxs = radii.max(axis = 0)[0]
+    pmins = rmaxs+1.0
+    pmaxs = side-rmaxs-1.0
+    x0 = np.random.uniform(pmins,pmaxs)
+    y0 = np.random.uniform(pmins,pmaxs)
     
-    x0 = x0.unsqueeze(1)
-    y0 = y0.unsqueeze(1)
+    x0 = torch.tensor(x0)
+    y0 = torch.tensor(y0)
+    
+    x0 = x0.unsqueeze(0)
+    y0 = y0.unsqueeze(0)
     #radii = torch.from_numpy(radii)
     xrfactors = torch.cos(theta).unsqueeze(0)
     yrfactors = torch.sin(theta).unsqueeze(0)
