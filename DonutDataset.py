@@ -6,7 +6,7 @@ import math
 
 global numpoints
 numpoints = 1000
-side = 32
+side = 64
 
 def donut_matrix(length = 10):
     radiusMax = side /3
@@ -14,7 +14,7 @@ def donut_matrix(length = 10):
     sigmas = [None, 1]
     
     canvas = torch.zeros((length,side, side))
-    r0 = torch.tensor(np.random.uniform(3.1, radiusMax, length))
+    r0 = torch.tensor(np.random.uniform(side/4, side/3, length))
 
     radii = torch.zeros((length,numpoints))
     radii[:, :] = r0.unsqueeze(1)
@@ -25,19 +25,21 @@ def donut_matrix(length = 10):
     theta *= math.pi*2.0/(float)(numpoints)
     
     for i in range(1,length):
-        a = np.random.uniform(1.0,3.0)*torch.sin(np.random.uniform(20.0)*theta+np.random.uniform(1000.0))
+        #a = np.random.uniform(1.0,3.0)*torch.sin(np.random.uniform(20.0)*theta+np.random.uniform(1000.0))
+        a = 4.0*torch.sin(10.0*theta)
         #print(a.shape,torch.max(a))
         radii[i,:] += a
         #print(radii.shape, torch.max(radii))
     
-
+    assert torch.min(radii)>0
     #print(radii.max(axis = 0)[0].shape)
     rmaxs = radii.max(axis = 1)[0]
     pmins = rmaxs+1.0
     pmaxs = side-rmaxs-1.0
     x0 = np.random.uniform(pmins,pmaxs)
     y0 = np.random.uniform(pmins,pmaxs)
-    
+    x0[:]=side/2
+    y0[:]=side/2
     x0 = torch.tensor(x0)
     y0 = torch.tensor(y0)
     
@@ -77,13 +79,21 @@ def plot_all( sample = None, model = None, labels = None):
             global numpoints
 
             pred = model(sample.unsqueeze(0).cuda())
-            X = pred[0,:numpoints]
-            Y = pred[0,-numpoints:]
+            predres = (int)(pred.shape[1]/2)
+            #print(pred.shape,predres, predres/2)
+            X = pred[0,:predres]
+            Y = pred[0,-predres:]
+            #print('X',X.shape)
+            #print(Y.shape)
+
             #print (X.shape,Y.shape)
-            s = [.1 for x in range(numpoints)]
-            assert len(s) == numpoints
-            c = ['red' for x in range(numpoints)]
-            assert len(c) == numpoints
+            s = [.001 for x in range(predres)]
+            print('s',len(s))
+            
+            assert len(s) == predres
+            c = ['red' for x in range(predres)]
+            print('c',len(c))
+            assert len(c) == predres
             ascatter = plt.scatter(Y.cpu().numpy(),X.cpu().numpy(),s = s,c = c)
             plt.gca().add_artist(ascatter)
     else:
@@ -92,7 +102,9 @@ def plot_all( sample = None, model = None, labels = None):
         X = labels[:numpoints,0]
         Y = labels[:numpoints,1]
         s = [.001 for x in range(numpoints)]
+        print(len(s))
         c = ['red' for x in range(numpoints)]
+        print(len(c))
         ascatter = plt.scatter(Y.cpu().numpy(),X.cpu().numpy(),s = s,c = c)
         plt.gca().add_artist(ascatter)
 

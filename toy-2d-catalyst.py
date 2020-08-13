@@ -6,9 +6,9 @@ import numpy as np
 from torch.utils import data
 from torchvision import transforms
 import argparse
-from CirclesLoad import CirclesLoad
+#from CirclesLoad import CirclesLoad
 from DonutDataset import DonutDataset
-from random_walk_dataset import RandomDataset
+#from random_walk_dataset import RandomDataset
 from customcriterion import CustomCriterion
 import torchvision.transforms.functional as F
 import os
@@ -62,9 +62,9 @@ runner.train(
     scheduler=scheduler,
     loaders=loaders,
     logdir=logdir,
-    num_epochs=10,
+    num_epochs=40,
     verbose=True,
     callbacks=[dl.BatchOverfitCallback(train=10, valid=10)]
 )
 
-RandomDataset.displayCanvas(dataset_val,model)
+DonutDataset.displayCanvas(dataset_val,model)

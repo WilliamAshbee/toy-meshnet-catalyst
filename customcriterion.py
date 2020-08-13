@@ -7,14 +7,22 @@ class CustomCriterion(_Loss):
         super(CustomCriterion, self).__init__(size_average, reduce, reduction)
         self.i = 0
     def forward(self, input, target):
-        xpred = input[:,:1000]
-        ypred = input[:,-1000:]
+        xpred = input[:,:100]
+        ypred = input[:,-100:]
+        
         
         xgt = target[:,:,0]
         ygt = target[:,:,1]
         
-        assert xpred.shape == xgt.shape 
-        assert ypred.shape == ygt.shape
-        
-        loss = torch.mean((xpred-xgt)**2+(ypred-ygt)**2)
+#       assert xpred.shape == xgt.shape 
+#       assert ypred.shape == ygt.shape
+        ind = [x for x in range(xpred.shape[1])]
+        #print(len(ind),ind)
+        c = True    
+        for i in ind:
+            if c:
+                loss = torch.mean((xpred[:,i].unsqueeze(1)-xgt[:,(int)(i*10):(int)((i+1)*10)])**4+(ypred[:,i].unsqueeze(1)-ygt[:,(int)(i*10):(int)((i+1)*10)])**4)
+                c = False
+            loss += torch.mean((xpred[:,i].unsqueeze(1)-xgt[:,(int)(i*10):(int)((i+1)*10)])**4+(ypred[:,i].unsqueeze(1)-ygt[:,(int)(i*10):(int)((i+1)*10)])**4)
+        loss = loss/len(ind)
         return loss

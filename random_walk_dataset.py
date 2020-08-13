@@ -13,7 +13,7 @@ def random_matrix(length = 10):
     radiusMax = side /3
     w = 1
     sigmas = [None, 1]
-
+    
     canvas = torch.zeros((length,side, side))
     x0 = np.random.uniform(1+radiusMax, side - radiusMax-1,length)
     y0 = np.random.uniform(1+radiusMax, side - radiusMax-1,length)
