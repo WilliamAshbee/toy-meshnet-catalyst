@@ -6,7 +6,7 @@ import math
 
 global numpoints
 numpoints = 1000
-side = 64
+side = 32
 
 global background
 background = torch.zeros(2,side,side)

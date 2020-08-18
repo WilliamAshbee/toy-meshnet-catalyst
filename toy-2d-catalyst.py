@@ -9,6 +9,9 @@ import argparse
 #from CirclesLoad import CirclesLoad
 from DonutDataset import DonutDataset
 #from random_walk_dataset import RandomDataset
+from loss import InpaintingLoss
+from net import VGG16FeatureExtractor
+
 from customcriterion import CustomCriterion
 import torchvision.transforms.functional as F
 import os
@@ -47,7 +50,8 @@ print('model')
 #model = resnet18(pretrained=False, progress=True).cuda()
 #model = inception_v3().cuda()
 model = resnext101_32x8d().cuda()
-criterion = CustomCriterion().cuda()
+#criterion = CustomCriterion().cuda()
+criterion = InpaintingLoss(VGG16FeatureExtractor()).cuda()
 optimizer = torch.optim.Adam(model.parameters(),lr=0.001, weight_decay = 0.0)
 scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer,milestones =  [3,6,9,12,18,24,30,40,50,60,70,80,90], gamma = .5)
 

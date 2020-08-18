@@ -18,7 +18,7 @@ def total_variation_loss(image):
     return loss
 
 global side
-side = 64
+side = 32
 class InpaintingLoss(nn.Module):
     def __init__(self, extractor):
         super().__init__()
@@ -32,8 +32,8 @@ class InpaintingLoss(nn.Module):
         ygt = target[:,:,1]
         assert xgt.shape == (gt.shape[0],1000)
         assert ygt.shape == (gt.shape[0],1000)
-        gt_img = torch.zeros(gt.shape[0],3,side,side)
-        pred_img = torch.zeros(gt.shape[0],3,side,side)
+        gt_img = torch.zeros(gt.shape[0],3,side,side).cuda()
+        pred_img = torch.zeros(gt.shape[0],3,side,side).cuda()
         
         if self.resnet:
             try:
@@ -47,14 +47,14 @@ class InpaintingLoss(nn.Module):
             xpred = input[:,:1000]
             ypred = input[:,-1000:]
         
-        
-        for i in range gt.shape[0]:
-            gt_img[i,:,xgt[i,:],ygt[i,:]] = 1.0 
-            pred_img[i,:,xgt[i,:],ygt[i,:]] = 1.0 
+
+        for i in range(gt.shape[0]):
+            gt_img[i,:,xgt[i,:].long(),ygt[i,:].long()] = 1.0 
+            pred_img[i,:,xgt[i,:].long(),ygt[i,:].long()] = 1.0 
             
-        if output.shape[1] == 3:
-            feat_output = self.extractor(output)
-            feat_gt = self.extractor(gt)
+        if pred_img.shape[1] == 3:
+            feat_output = self.extractor(pred_img)
+            feat_gt = self.extractor(gt_img)
         else:
             raise ValueError('only gray an')
 
@@ -68,5 +68,6 @@ class InpaintingLoss(nn.Module):
                                           gram_matrix(feat_gt[i]))
 
         #loss_dict['tv'] = total_variation_loss(output_comp)
-        loss = loss_dict['style']+loss_dict['prc']
-        return loss
+        #loss = loss_dict['style']+loss_dict['prc']
+        print(torch.sum(gt_img),torch.sum(pred_img))
+        return loss_dict['prc']
