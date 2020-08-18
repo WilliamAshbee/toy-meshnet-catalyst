@@ -12,7 +12,8 @@ from DonutDataset import DonutDataset
 from customcriterion import CustomCriterion
 import torchvision.transforms.functional as F
 import os
-from resnet import resnet18
+from resnet import resnet18, resnext101_32x8d
+from inception import inception_v3
 os.environ["CUDA_DEVICE_ORDER"]="PCI_BUS_ID"   # see issue #152
 os.environ["CUDA_VISIBLE_DEVICES"]="0"
 
@@ -21,13 +22,11 @@ mini_batch = 200
 #size = (32, 32)
 parser = argparse.ArgumentParser()
 
-
 parser.add_argument('--root', type=str, default='/data/mialab/users/washbee/circles-simple/')
 args = parser.parse_args()
 
 dataset_train = DonutDataset(40000)
 dataset_val = DonutDataset(256)
-
 
 loader_train = data.DataLoader(
     dataset_train, batch_size=mini_batch,
@@ -45,10 +44,12 @@ print('model')
 
 # model, criterion, optimizer, scheduler
 #model = vgg13().cuda()
-model = resnet18(pretrained=False, progress=True).cuda()
+#model = resnet18(pretrained=False, progress=True).cuda()
+#model = inception_v3().cuda()
+model = resnext101_32x8d().cuda()
 criterion = CustomCriterion().cuda()
 optimizer = torch.optim.Adam(model.parameters(),lr=0.001, weight_decay = 0.0)
-scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer,milestones =  [6, 12,18,24,30,40,50,60,70,80,90], gamma = .25)
+scheduler = torch.optim.lr_scheduler.MultiStepLR(optimizer,milestones =  [3,6,9,12,18,24,30,40,50,60,70,80,90], gamma = .5)
 
 print('training')
 
@@ -62,7 +63,7 @@ runner.train(
     scheduler=scheduler,
     loaders=loaders,
     logdir=logdir,
-    num_epochs=40,
+    num_epochs=70,
     verbose=True,
     callbacks=[dl.BatchOverfitCallback(train=10, valid=10)]
 )
